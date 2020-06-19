@@ -89,7 +89,7 @@ namespace ChatRESTfullAPI.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("ChatRESTfullAPI.Models.User", "User")
-                        .WithMany("ChatUsers")
+                        .WithMany("UserChats")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });

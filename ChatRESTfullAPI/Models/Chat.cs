@@ -12,6 +12,6 @@ namespace ChatRESTfullAPI.Models
         public int ChatId { get; set; }
         public string ChatName { get; set; }
         public ICollection<Message>ChatMessages { get; set; }        
-        public ICollection <ChatUser>ChatUsers { get; set; }  
+        public ICollection <ChatUser>ChatUsers { get; set; }    
     }
 }

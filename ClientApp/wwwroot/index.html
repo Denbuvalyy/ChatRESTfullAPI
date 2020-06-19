@@ -1,0 +1,122 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Client App</title>
+    <script src="lib/query/jquery.min.js"></script>
+</head>
+<body>
+    <h3>Happy chats</h3>
+    
+    <select id="mySelect"></select>   
+    <textarea id="messagefield" style="width:200px;height:350px;position:fixed"></textarea>
+        <pre id="preOutput"></pre>
+
+
+
+
+
+        <script>
+            var chatMessages;
+            var users;
+            $(document).ready(function () {
+                $.getJSON('https://localhost:44367/api/chats/', function (object) {
+                    
+                    chatMessages = object;
+
+                    for (i = 0; i < object.length; i++) {
+
+                        var z = document.createElement("option");
+                        z.setAttribute("value", object[i].chatId);
+                        var t = document.createTextNode(object[i].chatName);
+                        z.appendChild(t);
+                        document.getElementById("mySelect").appendChild(z);
+                    }
+
+                });
+
+            });
+            function start() {
+                document.getElementById("mySelect").addEventListener("change", addActivityItem, false);
+            }
+
+            function addActivityItem() {
+
+                //option is selected
+                var id = document.getElementById("mySelect").value;
+                var messages = chatMessages[id - 1].chatMessages;
+                document.getElementById("messagefield").innerHTML = '';
+                var url = 'https://localhost:44367/api/chats/'+ id+'/messages/';
+                $.getJSON(url, function (object) {
+
+                    users = object;
+
+                });
+
+                for (i = 0; i < messages.length; i++) {
+                    var t = document.createTextNode( messages[i].body + "\n");
+                    document.getElementById("messagefield").appendChild(t);
+                }
+
+               
+            }
+
+            window.addEventListener("load", start, false);
+
+
+            //$(function () {
+            //    var getChats = function () {
+            //        var url = "https://localhost:44367/api/chats";
+            //        $.get(url).always(showResponse);
+            //        return false;
+            //    }
+
+            //    var showResponse = function (object) {
+
+            //        $("#preOutput").append(x);
+
+            //        for (i = 0; i < object.length; i++) {
+
+            //            var z = document.createElement("option");
+            //            z.setAttribute("value", object[i].chatId);
+            //            var t = document.createTextNode(object[i].chatName);
+            //            z.appendChild(t);
+
+            //        }
+            //        document.getElementById("#mySelect").onchange(myFunction());
+            //       // $("#preOutput").text(JSON.stringify(object, null, 4));
+            //    }
+            //    $("#btnGetChats").click(getChats);
+            //});
+
+            function myFunction() {
+                alert("How are you!");
+
+                //$.ajax({
+                //    type: 'GET',
+                //    url: '/functions.php',
+                //    data: { get_param: 'value' },
+                //    success: function (data) {
+                //        for (var i = 0; i < data.length; ++i) {
+                //            $('#cand').append('<div class="name">data[i].name</>');
+                //        }
+                //    }
+                //});
+            };
+
+            function setdata() {
+                var chat = { chatname: "Fresh one", chatmessages: null, chatusers: null };
+                $.ajax({
+                    type: "POST",
+                    data: JSON.stringify(chat),
+                    url: "https://localhost:44367/api/chats",
+                    crossDomain: true,
+                    contentType: "application/json"
+                });
+            }
+
+                
+
+        </script>
+</body>
+</html>

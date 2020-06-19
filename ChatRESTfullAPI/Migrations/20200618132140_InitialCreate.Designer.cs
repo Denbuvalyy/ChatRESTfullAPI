@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ChatRESTfullAPI.Migrations
 {
     [DbContext(typeof(ChatContext))]
-    [Migration("20200617182130_InitialCreate")]
+    [Migration("20200618132140_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -91,7 +91,7 @@ namespace ChatRESTfullAPI.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("ChatRESTfullAPI.Models.User", "User")
-                        .WithMany("ChatUsers")
+                        .WithMany("UserChats")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });

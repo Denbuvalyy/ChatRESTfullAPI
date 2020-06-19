@@ -7,11 +7,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ChatRESTfullAPI.Data;
 using ChatRESTfullAPI.Models;
+using Microsoft.AspNetCore.Cors;
 
 namespace ChatRESTfullAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [EnableCors("HealthPolicy")]
     public class ChatsController : ControllerBase
     {
         private readonly ChatContext _context;
@@ -25,7 +27,8 @@ namespace ChatRESTfullAPI.Controllers
         [HttpGet]
         public IEnumerable<Chat> GetChats()
         {
-            return _context.Chats;
+           
+            return _context.Chats.Include(m=>m.ChatMessages);
         }
 
         // GET: api/Chats/5
@@ -35,9 +38,9 @@ namespace ChatRESTfullAPI.Controllers
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
-            }
-
-            var chat = await _context.Chats.FindAsync(id);
+            }           
+            var chat = await _context.Chats.Include(m=>m.ChatMessages)
+                .FirstOrDefaultAsync(i=>i.ChatId==id);            
 
             if (chat == null)
             {
@@ -45,6 +48,57 @@ namespace ChatRESTfullAPI.Controllers
             }
 
             return Ok(chat);
+        }
+
+
+        // GET: api/Chats/5/messages
+        [HttpGet("{id}/messages")]
+        public async Task<IActionResult> GetChatMessages([FromRoute] int id)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            var chat = await _context.Chats.Include(m => m.ChatMessages)
+                .FirstOrDefaultAsync(i => i.ChatId == id);
+
+            if (chat == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(chat.ChatMessages);
+        }
+
+        // GET: api/Chats/5/users
+        [HttpGet("{id}/users")]
+        public async Task<IActionResult> GetChatUsers([FromRoute] int id)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            var userWithChats = _context.Users.Include(u=>u.UserChats ).ToList();
+             
+            if (userWithChats == null)
+            {
+                return NotFound();
+            }
+            List<User> users = new List<User>();
+            foreach(var user in userWithChats)
+            {
+                var chat = user.UserChats.FirstOrDefault(h => h.ChatId == id);
+                if (chat != null)
+                {
+                    user.UserChats = null;
+
+
+                    users.Add(user);
+                }
+            }
+
+
+            return Ok(users);
         }
 
         // PUT: api/Chats/5

@@ -160,12 +160,20 @@
                     var par = document.createElement("span");
                     par.innerHTML = object[i].userName;
                     par.innerText += "\n";
+                    par.title = "To start a chat with the user click on them.";
                     par.style.fontStyle = "italic";
                     par.style.color = "red";
                     par.id = object[i].userId;
                     par.addEventListener("click", function () {
-                        alert("User name with id= " + this.id + " clicked");
+
+                        if (confirm("You about to start a private chat.")) {
+                            document.getElementById("messagefield").innerHTML = '';
+
+                        }
+                        //alert("User name with id= " + this.id + " clicked");
                         crntUserId = this.id;
+
+
                     });
                     document.getElementById("chatUsersField").appendChild(par);
                     
@@ -197,14 +205,33 @@
                             par = document.createElement("span");
                             par.innerText = "   " + chatMessages[j].body + "\n";
                             par.style.fontStyle = "italic";
-                            document.getElementById("messagefield").appendChild(par);                          
+                            par.id = chatMessages[j].msgId;
+                            par.addEventListener("click", function () {
+                                var crntMsg;
+                                for (j = 0; j < chatMessages.length; j++) {
+                                    if (chatMessages[j].msgId == this.id) {
+                                        crntMsg = chatMessages[j];
+                                        break;
+                                    }
+                                }
+                                if (crntMsg.userId == crntUser.userId) {
+                                    if (confirm("You can delete your message")) {
+                                        alert("Deleting your message");
+                                    }
+                                    else { alert("editing your message."); }
+                                }
+                                else {
+                                    if (confirm("Reply to sender personaly")) { alert("Replying to sender personaly"); }
+                                }
 
+                            }); 
+                            document.getElementById("messagefield").appendChild(par);                          
                         }
                     }
                 }
-
             });
         }
+        
 
     </script>
 </body>

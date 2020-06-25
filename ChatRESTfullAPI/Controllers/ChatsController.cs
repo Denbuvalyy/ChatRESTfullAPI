@@ -26,9 +26,9 @@ namespace ChatRESTfullAPI.Controllers
         // GET: api/Chats
         [HttpGet]
         public IEnumerable<Chat> GetChats()
-        {
-           
-            return _context.Chats.Include(m=>m.ChatMessages);
+        {         
+
+            return _context.Chats;
         }
 
         // GET: api/Chats/5
@@ -38,9 +38,8 @@ namespace ChatRESTfullAPI.Controllers
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
-            }           
-            var chat = await _context.Chats.Include(m=>m.ChatMessages)
-                .FirstOrDefaultAsync(i=>i.ChatId==id);            
+            }
+            var chat = await _context.Chats.FindAsync(id);
 
             if (chat == null)
             {
@@ -78,7 +77,7 @@ namespace ChatRESTfullAPI.Controllers
             {
                 return BadRequest(ModelState);
             }
-            var userWithChats = _context.Users.Include(u=>u.UserChats ).ToList();
+            var userWithChats = await _context.Users.Include(u=>u.UserChats ).ToListAsync();
              
             if (userWithChats == null)
             {
@@ -91,29 +90,42 @@ namespace ChatRESTfullAPI.Controllers
                 if (chat != null)
                 {
                     user.UserChats = null;
-
-
                     users.Add(user);
                 }
             }
 
-
-            return Ok(users);
+            return Ok(users.OrderBy(n=>n.UserName));
         }
 
         // PUT: api/Chats/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutChat([FromRoute] int id, [FromBody] Chat chat)
+        public async Task<IActionResult> PutChat([FromRoute] int id, [FromBody] Message message)//[FromBody] Chat chat)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
+           
+            var chat = await _context.Chats.Include(m => m.ChatMessages)
+                .FirstOrDefaultAsync(i => i.ChatId == id);
 
-            if (id != chat.ChatId)
+            if (chat == null)
             {
-                return BadRequest();
+                return NotFound();
             }
+
+            ChatUser chatUser = new ChatUser();
+            chatUser.ChatId = id;
+            chatUser.UserId = message.UserId;
+            _context.ChatsUsers.Add(chatUser);
+            await _context.SaveChangesAsync();
+
+            chat.ChatMessages.Add(message);
+
+            //if (id != chat.ChatId)
+            //{
+            //    return BadRequest();
+            //}
 
             _context.Entry(chat).State = EntityState.Modified;
 
@@ -147,8 +159,9 @@ namespace ChatRESTfullAPI.Controllers
 
             _context.Chats.Add(chat);
             await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetChat", new { id = chat.ChatId }, chat);
+            
+            return Ok(chat);
+            //return CreatedAtAction("GetChat", new { id = chat.ChatId }, chat);
         }
 
         // DELETE: api/Chats/5

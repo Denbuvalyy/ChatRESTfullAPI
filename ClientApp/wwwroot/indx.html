@@ -1,0 +1,211 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <link rel="shortcut icon" href="favicon.ico">
+    <meta charset="utf-8" />
+    <title>Client App</title>
+    <script src="lib/query/jquery.min.js"></script>
+</head>
+<body>
+    <div style="padding:5px;">
+        <h3>Happy chats</h3>
+        <div style="width:30%;float:left">
+            <select id="mySelect" autofocus onchange="ChooseOption(this.value);"></select>
+        </div>
+        <div style="width:30%;float:left;padding:5px;">
+            <label style="position:relative">Chat users:</label>
+            <div id="chatUsersField" style="width:100px;height:150px;overflow:auto;"></div>
+           
+            <button id="chatJoin" title="Join current chat" onclick="ChatJoin();" style="display:none;">Join chat</button>
+            <button onclick="setdata()">Create chat</button>
+
+        </div>
+        <div style="width:40%;float:left">
+            <label style="position:relative">Chat messages:</label>
+            <div id="messagefield" style="width:550px;height:300px;padding:3px;overflow:auto;border:1px solid grey"></div>
+        </div>
+    </div>
+
+    <pre id="preOutput"></pre>
+
+
+
+
+
+    <script>
+        var crntChatId;
+        var crntUser;
+        var chatMessages;
+        var users;
+        var crntUserId;
+        var np = document.createElement("p");
+        np.id = "hp";
+        var div = document.createElement("div");
+        div.appendChild(np);
+        document.body.appendChild(div);
+        var usrtxt = document.createElement("textarea");
+        usrtxt.style.width = "200px";
+        usrtxt.style.height = "50px";
+        usrtxt.style.overflow = "auto";
+        usrtxt.id = "usrTxt";
+        div.appendChild(usrtxt);
+        var btnSend = document.createElement("button");
+        var descrp = document.createTextNode("Send");
+        btnSend.appendChild(descrp);
+        btnSend.id = "sendBtn";
+        btnSend.style.display = "none";
+        div.appendChild(btnSend);
+
+        $(document).ready(function () {
+            $.getJSON('https://localhost:44367/api/chats/', function (object) {
+
+                for (i = 0; i < object.length; i++) {
+
+                    var z = document.createElement("option");
+                    z.setAttribute("value", object[i].chatId);
+                    var t = document.createTextNode(object[i].chatName);
+                    z.appendChild(t);
+                    document.getElementById("mySelect").appendChild(z);
+                }
+                document.getElementById("mySelect").options[0].selected = true;
+                document.getElementById("mySelect").onchange();
+            });
+            
+            UserCreate();
+           
+        });
+      
+       
+
+        function ChooseOption(selValue) {
+            crntChatId = selValue;           
+
+            ShowUsers();
+
+            $("#sendBtn").css("display", "block");
+        }
+
+            $("#sendBtn").click(function () {
+                if ($("#usrTxt").val() == "") { alert("Message can't be blank!"); }
+                else {
+
+                    var userMessage = { body: $("#usrTxt").val(), creationTime: new Date(), chatId: crntChatId, userId: crntUser.userId };
+                    $.ajax({
+                        type: "PUT",
+                        data: JSON.stringify(userMessage),
+                        url: "https://localhost:44367/api/chats/" + crntChatId,
+                        crossDomain: true,
+                        contentType: "application/json",
+                        success: function (data) {
+                            $("#usrTxt").val("");
+                            ShowUsers();
+                        }
+                    });
+                    
+
+                }
+                
+            });
+
+
+
+
+        function UserCreate() {
+
+            var user = { username: "Default user", usermessages: null, userchats: null };
+
+            $.ajax({
+                type: "POST",
+                data: JSON.stringify(user),
+                url: "https://localhost:44367/api/users",
+                crossDomain: true,
+                contentType: "application/json",
+                success: function (data) {
+                    crntUser = data;
+                    $("#hp").html("User: " + "<b>" + crntUser.userName + "</b>");
+
+                }
+            });
+        }
+        
+
+        function setdata() {
+            var chat = { chatname: "Fresh one", chatmessages: null, chatusers: null };
+            $.ajax({
+                type: "POST",
+                data: JSON.stringify(chat),
+                url: "https://localhost:44367/api/chats",
+                crossDomain: true,
+                contentType: "application/json",
+                success: function (data) {
+
+                    chatId = data.chatId;
+                    alert("chat id is:" + chatId);
+                    $("#userName").val(chatId);
+
+                }
+            });
+
+        }
+
+        function ShowUsers() {
+            document.getElementById("chatUsersField").innerHTML = '';
+
+            var url = 'https://localhost:44367/api/chats/' + crntChatId + '/users';
+            $.get(url, function (object) {
+                users = object;
+
+                for (i = 0; i < object.length; i++) {
+
+                    var par = document.createElement("span");
+                    par.innerHTML = object[i].userName;
+                    par.innerText += "\n";
+                    par.style.fontStyle = "italic";
+                    par.style.color = "red";
+                    par.id = object[i].userId;
+                    par.addEventListener("click", function () {
+                        alert("User name with id= " + this.id + " clicked");
+                        crntUserId = this.id;
+                    });
+                    document.getElementById("chatUsersField").appendChild(par);
+                    
+                }
+                ShowMessages();
+
+            });           
+              
+        }
+
+        function ShowMessages() {
+            document.getElementById("messagefield").innerHTML = '';
+
+            var url = 'https://localhost:44367/api/chats/' + crntChatId + '/messages/';
+            $.getJSON(url, function (object) {
+
+                chatMessages = object;
+
+
+                for (j = 0; j < chatMessages.length; j++) {
+                    for (i = 0; i < users.length; i++) {
+                        if (chatMessages[j].userId == users[i].userId) {
+
+                            var par = document.createElement("span");
+                            par.innerText = users[i].userName + ": ";
+
+                            par.style.color = "red";
+                            document.getElementById("messagefield").appendChild(par);
+                            par = document.createElement("span");
+                            par.innerText = "   " + chatMessages[j].body + "\n";
+                            par.style.fontStyle = "italic";
+                            document.getElementById("messagefield").appendChild(par);                          
+
+                        }
+                    }
+                }
+
+            });
+        }
+
+    </script>
+</body>
+</html>

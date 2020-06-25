@@ -55,6 +55,7 @@ namespace ChatRESTfullAPI
             app.UseHttpsRedirection();
             app.UseMvc();
             ArtificialData.Initialize(app);
+            app.UseCors("HealthPolicy");
         }
     }
 }

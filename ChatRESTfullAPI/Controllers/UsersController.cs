@@ -49,25 +49,9 @@ namespace ChatRESTfullAPI.Controllers
             return Ok(user);
         }
 
-        // GET: api/Users/5
-        [HttpGet("{id}/chats")]
-        public async Task<IActionResult> GetUserChats([FromRoute] int id)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-            var user = await _context.Users.Include(c => c.UserChats).ThenInclude(row=>row.Chat)
-                .FirstOrDefaultAsync(i => i.UserId == id);
-            //var user = await _context.Users.FindAsync(id);
+       
 
-            if (user == null)
-            {
-                return NotFound();
-            }
-
-            return Ok(user.UserChats);
-        }
+       
 
         // PUT: api/Users/5
         [HttpPut("{id}")]
@@ -116,7 +100,10 @@ namespace ChatRESTfullAPI.Controllers
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetUser", new { id = user.UserId }, user);
+            
+
+            return Ok(user);
+            //return CreatedAtAction("GetUser", new { id = user.UserId }, user);
         }
 
         // DELETE: api/Users/5

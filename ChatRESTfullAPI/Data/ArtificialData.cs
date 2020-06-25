@@ -70,26 +70,24 @@ namespace ChatRESTfullAPI.Data
 
         public static List<Message> GetMessages(ChatContext db)
         {
+            Random rnd = new Random();
             List<Chat> chats = db.Chats.ToList();
-            List<User> users = db.Users.ToList();
-            List<int> chatIds = new List<int>();
-            List<int> userIds = new List<int>();
+            List<ChatUser> chatUsers = db.ChatsUsers.ToList();
+          
+            List<ChatUser> chatUsersIds = null;
             int index;
             List<Message> messages = new List<Message>();
 
-            for (int i = 0; i < 20;i++)
+            for (int i = 0; i < 100;i++)
             {
                 var message = new Message();
                 message.Body = MessegaGeny();
                 message.CreationTime = DateTime.Now;
-
-                index = CheckIndex(chatIds,db.Chats.Count());                
+                index = rnd.Next(0, chats.Count);
                 message.ChatId = chats[index].ChatId;
-                chatIds.Add(index);                
-                
-                index = CheckIndex(userIds, db.Users.Count());                 
-                message.UserId =users[index].UserId;
-                userIds.Add(index);                
+                chatUsersIds = chatUsers.Where(p => p.ChatId == chats[index].ChatId).ToList();
+                index = rnd.Next(0,chatUsersIds.Count);
+                message.UserId =chatUsersIds[index].UserId;                
                 messages.Add(message);
             }                     
             return messages;
@@ -104,7 +102,9 @@ namespace ChatRESTfullAPI.Data
                 new User{UserName="Tom"},
                 new User{UserName="Grumpy"},
                 new User{UserName="Smiley"},
-                new User{UserName="The Last"}
+                new User{UserName="The Last"},
+                new User{UserName="Ficus"},
+                new User{UserName="Archie"}
             };
             return users;
         }
@@ -117,7 +117,9 @@ namespace ChatRESTfullAPI.Data
                 new Chat{ChatName="Weekend plans"},
                 new Chat{ChatName="Holiday impression"},
                 new Chat{ChatName="The best pub opinion"},
-                new Chat{ChatName="Getting out from here"}
+                new Chat{ChatName="Getting out from here"},
+                new Chat{ChatName="Monday mood"},
+                new Chat{ChatName="The best impression"}
             };
             return chats;
         }
@@ -137,10 +139,11 @@ namespace ChatRESTfullAPI.Data
                 {
                     var item = new ChatUser();
                     item.Chat = chat;
-                    index =CheckIndex(existingItems, users.Count);                   
+
+                    index = CheckIndex(existingItems, users.Count);
                     item.User = users[index];
                     existingItems.Add(index);
-                   
+
                     chatUsers.Add(item);
                 }
             }

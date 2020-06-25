@@ -105,21 +105,29 @@ namespace ChatRESTfullAPI.Controllers
             {
                 return BadRequest(ModelState);
             }
-           
-            var chat = await _context.Chats.Include(m => m.ChatMessages)
-                .FirstOrDefaultAsync(i => i.ChatId == id);
+            
+            var user = await _context.Users.FindAsync(message.UserId);
+            var chat = await _context.Chats.Include(m => m.ChatMessages).Include(p => p.ChatUsers)
+                .FirstOrDefaultAsync(i => i.ChatId == id);           
 
             if (chat == null)
             {
                 return NotFound();
             }
 
-            ChatUser chatUser = new ChatUser();
-            chatUser.ChatId = id;
-            chatUser.UserId = message.UserId;
-            _context.ChatsUsers.Add(chatUser);
-            await _context.SaveChangesAsync();
+            if (user == null)
+            {
+                return NotFound();
+            }
 
+            if (!chat.ChatUsers.Where(n => n.UserId == message.UserId).Any())
+            {
+                ChatUser chatUser = new ChatUser();               
+                chatUser.Chat = chat;
+                chatUser.User = user;
+                _context.ChatsUsers.Add(chatUser);
+                await _context.SaveChangesAsync();
+            }
             chat.ChatMessages.Add(message);
 
             //if (id != chat.ChatId)

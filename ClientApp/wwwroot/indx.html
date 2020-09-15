@@ -225,6 +225,7 @@
                 success: function (data) {
                     document.getElementById("mySelect").options[chats.length - 1].selected = true;
                     document.getElementById("mySelect").onchange();
+                    $("#usrTxt").focus();
                     //chatId = data.chatId;
                     //alert("chat id is:" + chatId);
                     //$("#userName").val(chatId);

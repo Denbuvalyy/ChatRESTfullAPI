@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="wwwroot\css\Layout.css" />
     <None Include="wwwroot\favicon.ico" />
   </ItemGroup>
 

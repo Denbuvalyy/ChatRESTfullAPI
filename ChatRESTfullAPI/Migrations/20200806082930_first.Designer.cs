@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ChatRESTfullAPI.Migrations
 {
     [DbContext(typeof(ChatContext))]
-    [Migration("20200618132140_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20200806082930_first")]
+    partial class first
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -60,6 +60,8 @@ namespace ChatRESTfullAPI.Migrations
                     b.Property<DateTime>("CreationTime");
 
                     b.Property<int>("UserId");
+
+                    b.Property<bool>("UserNotVisible");
 
                     b.HasKey("MsgId");
 

@@ -1,0 +1,101 @@
+﻿* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0px;
+}
+
+.specialOne {
+    /*background: url("./Images/Сакре-Кьор.jpg") fixed center center no-repeat;
+    background-size: cover;
+    padding: 350px;*/
+    width: 100%;
+    height: 50%;
+}
+
+    .specialOne img {
+        width: 100vw;
+        height: 50%;
+    }
+
+img {
+    border: 4px solid grey;
+}
+
+.left {
+    float: left;
+    width: 30%;
+    text-align: center;
+    padding: 15px;
+   
+}
+
+    
+
+.main {
+    float: left;
+    width: 40%;
+    padding: 0px 25px;
+    text-align: justify;
+}
+
+.right {
+    background-color:burlywood;
+    float: left;
+    width: 40%;
+    padding: 10px 10px;
+    margin-top: 50px;
+    color: black;
+    text-align: justify;
+}
+
+
+.bottom {
+    width:100vw;
+    height:350px;
+    padding:20px;
+    margin:20px;
+    overflow:auto;
+    border:1px solid grey;
+}  
+   
+
+ul.demo {
+    border: 1px grey solid;
+    display: none;
+    position: absolute;
+    width: 50%;
+    height: 50%;
+    background-color: lightgray;   
+    list-style-type: none;
+    margin: 0;
+    padding: 0;    
+}
+
+ul li {
+    padding:15px;
+    cursor:pointer;
+}    
+
+ul li:hover {
+    background-color:darkgray;
+}
+
+.msheader {
+    cursor:default;
+}
+
+.msheader:hover {
+    background-color:Highlight;
+}
+
+@media only screen and (max-width:620px) {
+    /* For mobile phones: */
+    .left, .main, .right {
+        width: 100%;
+    }
+    #sendBtn {
+        margin-left:100px;
+    }
+}

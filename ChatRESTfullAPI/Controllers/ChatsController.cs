@@ -77,7 +77,7 @@ namespace ChatRESTfullAPI.Controllers
             {
                 return BadRequest(ModelState);
             }
-            var userWithChats = await _context.Users.Include(u=>u.UserChats ).ToListAsync();
+            var userWithChats = await _context.Users.Include(u=>u.UserChats ).Include(m=>m.UserMessages).ToListAsync();
              
             if (userWithChats == null)
             {
@@ -159,15 +159,50 @@ namespace ChatRESTfullAPI.Controllers
         // POST: api/Chats
         [HttpPost]
         public async Task<IActionResult> PostChat([FromBody] Chat chat)
-        {
+         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
+  
+            List<ChatUser> tempUsers = chat.ChatUsers.ToList();
+            chat.ChatUsers = null;
 
             _context.Chats.Add(chat);
             await _context.SaveChangesAsync();
-            
+
+            //chat.ChatUsers = tempUsers;
+
+            //for (int i = 0; i < tempUsers.Count; i++)
+            //{
+            //    ChatUser chatUser = new ChatUser();
+            //    chatUser.Chat = chat;
+            //    var user = await _context.Users.FindAsync(tempUsers[i].UserId);
+            //    chatUser.User = user;
+            //    _context.ChatsUsers.Add(chatUser);
+            //    await _context.SaveChangesAsync();
+            //}
+
+            //_context.Entry(chat).State = EntityState.Modified;
+
+            //try
+            //{
+            //    await _context.SaveChangesAsync();
+            //}
+            //catch (DbUpdateConcurrencyException)
+            //{
+            //    if (!ChatExists(chat.ChatId))
+            //    {
+            //        return NotFound();
+            //    }
+            //    else
+            //    {
+            //        throw;
+            //    }
+            //}
+
+           
+
             return Ok(chat);
             //return CreatedAtAction("GetChat", new { id = chat.ChatId }, chat);
         }

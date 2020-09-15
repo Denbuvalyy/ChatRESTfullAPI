@@ -2,11 +2,66 @@
 <html>
 <head>
     <link rel="shortcut icon" href="favicon.ico">
+    <link href="./css/Layout.css" rel="stylesheet" />
     <meta charset="utf-8" />
     <title>Client App</title>
     <script src="lib/query/jquery.min.js"></script>
 </head>
 <body>
+    <div style="overflow:auto;">
+        <div class="left">
+            <button onclick="setdata()">Create chat</button>
+            <select id="mySelect" autofocus onchange="ChooseOption(this.value);"></select>
+        </div>
+
+        <div class="main">
+            <label style="position:relative">Chat users:</label>
+            <div>
+                <ul class="demo" id="user_popup">
+                    <li id="msgheadUP" class="msheader" style="color:white;background-color:Highlight;margin-top:0px;"></li>
+                    <li onclick="StartPrivateChat(crntMess, crntUser);">start a private chat</li>                    
+                    <li onclick="HidePopup('user_popup');">cancel</li>
+                </ul>
+            </div>
+            <div id="chatUsersField"></div>
+
+            <button id="chatJoin" title="Join current chat" onclick="ChatJoin();" style="display:none;">Join chat</button>
+
+        </div>
+
+        <div class="left" id="usermsg">            
+                <p id="hp"></p>
+                <textarea id="usrTxt" style="width:300px;height:50px;overflow:auto;"></textarea>
+                <button id="sendBtn" style="display:none;margin-left:70px;">Send</button>
+                <button id="updateMsg" style="display:none;margin-left:70px;">Ok</button>            
+        </div>
+
+    </div>
+
+    <div class="bottom">
+        <label style="position:relative;">Chat messages:</label>
+        <hr />
+        <div>
+            <ul class="demo" id="mine_popup">
+                <li id="msghead" class="msheader" style="color:white;background-color:Highlight;margin-top:0px;"></li>
+                <li onclick="MsgDeleteOne(crntMess);">delete for myself</li>
+                <li onclick="MsgDelete();">delete for everyone</li>
+                <li onclick="MsgEdit()">edit</li>
+                <li onclick="HidePopup('mine_popup');">cancel</li>
+            </ul>
+        </div>
+        <div>
+            <ul class="demo" id="mine_popupPrvt">
+                <li id="msgheadPrvt" class="msheader" style="color:white;background-color:Highlight;margin-top:0px;"></li>               
+                <li onclick="Reply(crntMess, crntUser);">reply</li>
+                <li onclick="ReplyPerson(crntMess, crntUser);">reply to sender personaly</li>
+                <li onclick="StartPrivateChat(crntMess, crntUser);">start a private chat</li>
+                <li onclick="HidePopup('mine_popupPrvt');">cancel</li>
+            </ul>
+        </div>
+        <div id="messagefield"></div>
+    </div>
+    <!--
     <div style="padding:5px;">
         <h3>Happy chats</h3>
         <div style="width:30%;float:left">
@@ -15,7 +70,7 @@
         <div style="width:30%;float:left;padding:5px;">
             <label style="position:relative">Chat users:</label>
             <div id="chatUsersField" style="width:100px;height:150px;overflow:auto;"></div>
-           
+
             <button id="chatJoin" title="Join current chat" onclick="ChatJoin();" style="display:none;">Join chat</button>
             <button onclick="setdata()">Create chat</button>
 
@@ -25,6 +80,7 @@
             <div id="messagefield" style="width:550px;height:300px;padding:3px;overflow:auto;border:1px solid grey"></div>
         </div>
     </div>
+        -->
 
     <pre id="preOutput"></pre>
 
@@ -33,18 +89,20 @@
 
 
     <script>
+        var chats;
         var crntChatId;
         var crntUser;
         var chatMessages;
         var users;
         var crntUserId;
-        var np = document.createElement("p");
+        var crntMess;
+        /*var np = document.createElement("p");
         np.id = "hp";
         var div = document.createElement("div");
         div.appendChild(np);
-        document.body.appendChild(div);
+        //document.body.appendChild(div);
         var usrtxt = document.createElement("textarea");
-        usrtxt.style.width = "200px";
+        usrtxt.style.width = "auto";
         usrtxt.style.height = "50px";
         usrtxt.style.overflow = "auto";
         usrtxt.id = "usrTxt";
@@ -55,10 +113,22 @@
         btnSend.id = "sendBtn";
         btnSend.style.display = "none";
         div.appendChild(btnSend);
+        document.getElementById("usermsg").appendChild(div);
+        */
+        document.getElementById("mine_popup").onmouseleave = function () {
+            document.getElementById("mine_popup").style.display = "none";
+        };
+        document.getElementById("mine_popupPrvt").onmouseleave = function () {
+            document.getElementById("mine_popupPrvt").style.display = "none";
+        };
+        document.getElementById("user_popup").onmouseleave = function () {
+            document.getElementById("user_popup").style.display = "none";
+        };
 
         $(document).ready(function () {
             $.getJSON('https://localhost:44367/api/chats/', function (object) {
 
+                chats = object;
                 for (i = 0; i < object.length; i++) {
 
                     var z = document.createElement("option");
@@ -70,42 +140,42 @@
                 document.getElementById("mySelect").options[0].selected = true;
                 document.getElementById("mySelect").onchange();
             });
-            
+
             UserCreate();
-           
+
         });
-      
-       
+
+
 
         function ChooseOption(selValue) {
-            crntChatId = selValue;           
+            crntChatId = selValue;
 
             ShowUsers();
 
             $("#sendBtn").css("display", "block");
         }
 
-            $("#sendBtn").click(function () {
-                if ($("#usrTxt").val() == "") { alert("Message can't be blank!"); }
-                else {
+        $("#sendBtn").click(function () {
+            if ($("#usrTxt").val() == "") { alert("Message can't be blank!"); }
+            else {
 
-                    var userMessage = { body: $("#usrTxt").val(), creationTime: new Date(), chatId: crntChatId, userId: crntUser.userId };
-                    $.ajax({
-                        type: "PUT",
-                        data: JSON.stringify(userMessage),
-                        url: "https://localhost:44367/api/chats/" + crntChatId,
-                        crossDomain: true,
-                        contentType: "application/json",
-                        success: function (data) {
-                            $("#usrTxt").val("");
-                            ShowUsers();
-                        }
-                    });
-                    
+                var userMessage = { body: $("#usrTxt").val(), creationTime: new Date(), chatId: crntChatId, userId: crntUser.userId };
+                $.ajax({
+                    type: "PUT",
+                    data: JSON.stringify(userMessage),
+                    url: "https://localhost:44367/api/chats/" + crntChatId,
+                    crossDomain: true,
+                    contentType: "application/json",
+                    success: function (data) {
+                        $("#usrTxt").val("");
+                        ShowUsers();
+                        
+                    }
+                });                
+               
+            }
 
-                }
-                
-            });
+        });
 
 
 
@@ -127,10 +197,25 @@
                 }
             });
         }
-        
 
-        function setdata() {
-            var chat = { chatname: "Fresh one", chatmessages: null, chatusers: null };
+
+        function StartPrivateChat(crntMess, crntUser) {
+
+            var scndUser;          
+
+            for (var i = 0; i < users.length; i++) {
+                if (users[i].userId == crntMess.userId) {
+                    scndUser = users[i];
+                    break;
+                }
+            }
+
+            var chatUsers = [{ "userId": crntUser.userId, "user": crntUser },
+            { "userId": scndUser.userId, "user": scndUser }];
+            var chat = {
+                chatname: scndUser.userName + "&" + crntUser.userName, chatmessages: null,
+                chatusers: chatUsers
+            };
             $.ajax({
                 type: "POST",
                 data: JSON.stringify(chat),
@@ -138,10 +223,11 @@
                 crossDomain: true,
                 contentType: "application/json",
                 success: function (data) {
-
-                    chatId = data.chatId;
-                    alert("chat id is:" + chatId);
-                    $("#userName").val(chatId);
+                    document.getElementById("mySelect").options[chats.length - 1].selected = true;
+                    document.getElementById("mySelect").onchange();
+                    //chatId = data.chatId;
+                    //alert("chat id is:" + chatId);
+                    //$("#userName").val(chatId);
 
                 }
             });
@@ -156,7 +242,9 @@
                 users = object;
 
                 for (i = 0; i < object.length; i++) {
-
+                    if (object[i].userId == crntUser.userId) {
+                        crntUser = object[i];
+                    }
                     var par = document.createElement("span");
                     par.innerHTML = object[i].userName;
                     par.innerText += "\n";
@@ -165,26 +253,29 @@
                     par.style.color = "red";
                     par.id = object[i].userId;
                     par.addEventListener("click", function () {
+                        document.getElementById("msgheadUP").innerHTML = this.innerHTML.substr(0, 15);
+                        document.getElementById("user_popup").style.display = "block";
+                        //if (confirm("You about to start a private chat.")) {
+                        //    document.getElementById("messagefield").innerHTML = '';
 
-                        if (confirm("You about to start a private chat.")) {
-                            document.getElementById("messagefield").innerHTML = '';
-
-                        }
+                        //}
                         //alert("User name with id= " + this.id + " clicked");
                         crntUserId = this.id;
 
 
                     });
                     document.getElementById("chatUsersField").appendChild(par);
-                    
+
                 }
+                //GetCrntUser(crntUser.userId);
                 ShowMessages();
 
-            });           
-              
+            });
+
         }
 
         function ShowMessages() {
+           
             document.getElementById("messagefield").innerHTML = '';
 
             var url = 'https://localhost:44367/api/chats/' + crntChatId + '/messages/';
@@ -192,11 +283,14 @@
 
                 chatMessages = object;
 
-
+                var j, i;
                 for (j = 0; j < chatMessages.length; j++) {
                     for (i = 0; i < users.length; i++) {
                         if (chatMessages[j].userId == users[i].userId) {
-
+                            if ((chatMessages[j].userId == crntUser.userId) && (chatMessages[j].userNotVisible==true)) {//!MsgExist(chatMessages[j].msgId)) {
+                                continue;
+                            }
+                            
                             var par = document.createElement("span");
                             par.innerText = users[i].userName + ": ";
 
@@ -215,23 +309,122 @@
                                     }
                                 }
                                 if (crntMsg.userId == crntUser.userId) {
-                                    if (confirm("You can delete your message")) {
-                                        alert("Deleting your message");
-                                    }
-                                    else { alert("editing your message."); }
+                                    document.getElementById("msghead").innerHTML = crntMsg.body.substr(0,15)+"...";
+                                    document.getElementById("mine_popup").style.display = "block";
+                                    crntMess = crntMsg;                                   
                                 }
+                                
                                 else {
-                                    if (confirm("Reply to sender personaly")) { alert("Replying to sender personaly"); }
+                                    document.getElementById("msgheadPrvt").innerHTML = crntMsg.body.substr(0, 15) + "...";
+                                    document.getElementById("mine_popupPrvt").style.display = "block";
+                                    crntMess = crntMsg;    
                                 }
 
-                            }); 
-                            document.getElementById("messagefield").appendChild(par);                          
+                            });
+                            document.getElementById("messagefield").appendChild(par);
                         }
                     }
                 }
             });
         }
-        
+
+        function MsgDelete() {
+            document.getElementById("mine_popup").style.display = "none";
+            
+            $.ajax({
+                type: "DELETE",                
+                url: "https://localhost:44367/api/Messages/" + crntMess.msgId,
+                crossDomain: true,
+                contentType: "application/json",
+                success: function (data) {                    
+                    ShowUsers();
+                }
+            });
+        }
+
+        function MsgEdit() {
+            document.getElementById("mine_popup").style.display = "none";
+            document.getElementById("usrTxt").value = crntMess.body;
+            $("#sendBtn").css("display", "none");
+            document.getElementById("updateMsg").style.display = "block";
+        }
+
+        $("#updateMsg").click(function () {
+            crntMess.body = $("#usrTxt").val();
+            $.ajax({
+                type: "PUT",
+                data: JSON.stringify(crntMess),
+                url: "https://localhost:44367/api/Messages/" + crntMess.msgId,
+                crossDomain: true,
+                contentType: "application/json",
+                success: function (data) {                    
+                    ShowUsers();
+                }
+            });
+            $("#sendBtn").css("display", "block");
+            document.getElementById("updateMsg").style.display = "none";
+            $("#usrTxt").val("");
+        }); 
+
+        //function MsgExist(msgId) {
+        //    var Msexist = false;
+        //    if (crntUser.userMessages != null) {
+        //        var msglist = crntUser.userMessages;
+        //        for (i = 0; i < msglist.length; i++) {
+        //            if (msglist[i].msgId == msgId) {
+        //                Msexist = true;
+        //                break;
+        //            }
+        //        }
+        //    }
+        //    return Msexist;
+        //}
+
+        //function GetCrntUser(userId) {
+        //    var user;
+        //    var url = 'https://localhost:44367/api/Users/' + userId;            
+
+        //    $.get(url, function (object) {
+        //        user = object;
+        //    });
+        //    //$.ajax({
+        //    //    type: "GET",
+        //    //    url: url,
+        //    //    crossDomain: true,
+        //    //    contentType: "application/json",
+        //    //    success: function (data) {
+        //    //        user = data;
+
+        //    //    }
+        //    //});
+        //    return user;
+        //}
+
+        function MsgDeleteOne(CrntMsg) {
+            document.getElementById("mine_popup").style.display = "none";
+            
+            CrntMsg.UserNotVisible = true;
+            
+                $.ajax({
+                    type: "PUT",
+                    data: JSON.stringify(CrntMsg),
+                    url: "https://localhost:44367/api/Messages/" + CrntMsg.msgId,
+                    crossDomain: true,
+                    contentType: "application/json",
+                    success: function (data) {                        
+                        ShowUsers();
+                    }
+                });
+            
+        }
+
+        function HidePopup(id) {
+            document.getElementById(id).style.display = "none";
+        }
+
+        function ReplyPerson(crntMess, crntUser) {
+
+        }
 
     </script>
 </body>

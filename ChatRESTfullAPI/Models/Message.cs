@@ -13,6 +13,7 @@ namespace ChatRESTfullAPI.Models
         public DateTime CreationTime { get; set; }
         public string Body { get; set; }
         public int UserId { get; set; }        
-        public int ChatId { get; set; } 
+        public int ChatId { get; set; }
+        public bool UserNotVisible { get; set; }
     }
 }

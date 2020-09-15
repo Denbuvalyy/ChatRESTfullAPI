@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace ChatRESTfullAPI.Migrations
 {
-    public partial class InitialCreate : Migration
+    public partial class first : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -67,7 +67,8 @@ namespace ChatRESTfullAPI.Migrations
                     CreationTime = table.Column<DateTime>(nullable: false),
                     Body = table.Column<string>(nullable: true),
                     UserId = table.Column<int>(nullable: false),
-                    ChatId = table.Column<int>(nullable: false)
+                    ChatId = table.Column<int>(nullable: false),
+                    UserNotVisible = table.Column<bool>(nullable: false)
                 },
                 constraints: table =>
                 {

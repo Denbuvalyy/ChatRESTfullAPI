@@ -59,6 +59,8 @@ namespace ChatRESTfullAPI.Migrations
 
                     b.Property<int>("UserId");
 
+                    b.Property<bool>("UserNotVisible");
+
                     b.HasKey("MsgId");
 
                     b.HasIndex("ChatId");

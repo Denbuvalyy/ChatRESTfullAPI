@@ -14,61 +14,56 @@ namespace ChatRESTfullAPI.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [EnableCors("HealthPolicy")]
-    public class UsersController : ControllerBase
+    public class MessagesController : ControllerBase
     {
         private readonly ChatContext _context;
 
-        public UsersController(ChatContext context)
+        public MessagesController(ChatContext context)
         {
             _context = context;
         }
 
-        // GET: api/Users
+        // GET: api/Messages
         [HttpGet]
-        public IEnumerable<User> GetUsers()
+        public IEnumerable<Message> GetMessages()
         {
-            return _context.Users;
+            return _context.Messages;
         }
 
-        // GET: api/Users/5
+        // GET: api/Messages/5
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetUser([FromRoute] int id)
+        public async Task<IActionResult> GetMessage([FromRoute] int id)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            var user = await _context.Users.Include(m => m.UserMessages)
-                .FirstOrDefaultAsync(p => p.UserId == id);// FindAsync(id);
+            var message = await _context.Messages.FindAsync(id);
 
-            if (user == null)
+            if (message == null)
             {
                 return NotFound();
             }
 
-            return Ok(user);
+            return Ok(message);
         }
 
-       
-
-       
-
-        // PUT: api/Users/5
+        // PUT: api/Messages/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutUser([FromRoute] int id, [FromBody] User user)
+        public async Task<IActionResult> PutMessage([FromRoute] int id, [FromBody] Message message)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            if (id != user.UserId)
+            if (id != message.MsgId)
             {
                 return BadRequest();
             }
-          
-            _context.Entry(user).State = EntityState.Modified;
+
+            _context.Entry(message).State = EntityState.Modified;
 
             try
             {
@@ -76,7 +71,7 @@ namespace ChatRESTfullAPI.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!UserExists(id))
+                if (!MessageExists(id))
                 {
                     return NotFound();
                 }
@@ -89,48 +84,45 @@ namespace ChatRESTfullAPI.Controllers
             return NoContent();
         }
 
-        // POST: api/Users
+        // POST: api/Messages
         [HttpPost]
-        public async Task<IActionResult> PostUser([FromBody] User user)
+        public async Task<IActionResult> PostMessage([FromBody] Message message)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            _context.Users.Add(user);
+            _context.Messages.Add(message);
             await _context.SaveChangesAsync();
 
-            
-
-            return Ok(user);
-            //return CreatedAtAction("GetUser", new { id = user.UserId }, user);
+            return CreatedAtAction("GetMessage", new { id = message.MsgId }, message);
         }
 
-        // DELETE: api/Users/5
+        // DELETE: api/Messages/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteUser([FromRoute] int id)
+        public async Task<IActionResult> DeleteMessage([FromRoute] int id)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            var user = await _context.Users.FindAsync(id);
-            if (user == null)
+            var message = await _context.Messages.FindAsync(id);
+            if (message == null)
             {
                 return NotFound();
             }
 
-            _context.Users.Remove(user);
+            _context.Messages.Remove(message);
             await _context.SaveChangesAsync();
 
-            return Ok(user);
+            return Ok(message);
         }
 
-        private bool UserExists(int id)
+        private bool MessageExists(int id)
         {
-            return _context.Users.Any(e => e.UserId == id);
+            return _context.Messages.Any(e => e.MsgId == id);
         }
     }
 }

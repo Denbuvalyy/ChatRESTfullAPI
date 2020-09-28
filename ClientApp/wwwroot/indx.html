@@ -8,58 +8,86 @@
     <script src="lib/query/jquery.min.js"></script>
 </head>
 <body>
-    <div style="overflow:auto;">
-        <div class="left">
-            <button onclick="setdata()">Create chat</button>
-            <select id="mySelect" autofocus onchange="ChooseOption(this.value);"></select>
-        </div>
-
-        <div class="main">
-            <label style="position:relative">Chat users:</label>
-            <div>
-                <ul class="demo" id="user_popup">
-                    <li id="msgheadUP" class="msheader" style="color:white;background-color:Highlight;margin-top:0px;"></li>
-                    <li onclick="StartPrivateChat(crntMess, crntUser);">start a private chat</li>                    
-                    <li onclick="HidePopup('user_popup');">cancel</li>
-                </ul>
-            </div>
-            <div id="chatUsersField"></div>
-
-            <button id="chatJoin" title="Join current chat" onclick="ChatJoin();" style="display:none;">Join chat</button>
-
-        </div>
-
-        <div class="left" id="usermsg">            
-                <p id="hp"></p>
-                <textarea id="usrTxt" style="width:300px;height:50px;overflow:auto;"></textarea>
-                <button id="sendBtn" style="display:none;margin-left:70px;">Send</button>
-                <button id="updateMsg" style="display:none;margin-left:70px;">Ok</button>            
-        </div>
-
+    <div class="ss-item-required" id="regform" style="margin:10px;padding:10px;width:80vw;height:500px;overflow:auto; border:2px solid black;display:none;">
+        <h4>Registration</h4>
+        Email:
+        <input id="field0" name="email" placeholder="email"/>
+        <br /><br />
+        Login:
+        <input id="field1" name="login" placeholder="login"/>
+        <br /><br />
+        Password:
+        <input id="field2" name="password" placeholder="password"/>
+        <br /><br />
+        Password:
+        <input id="field3" name="password" placeholder="retype password"/>
+        <br /><br />
+        <button onclick="SubmitForm();">Register</button>
     </div>
+    <div id="mainform">
+        <div style="overflow:auto;">
+            <div class="left">
+                <button onclick="setdata()">Create chat</button>
+                <select id="mySelect" autofocus onchange="ChooseOption(this.value);"></select>
+            </div>
+            <div class="left">
+                Login:
+                <input />
+                <br /><br />
+                Password:
+                <input />
+                <br /><br />
+                <button onclick="RegisterUser();">Register</button>
+            </div>
 
-    <div class="bottom">
-        <label style="position:relative;">Chat messages:</label>
-        <hr />
-        <div>
-            <ul class="demo" id="mine_popup">
-                <li id="msghead" class="msheader" style="color:white;background-color:Highlight;margin-top:0px;"></li>
-                <li onclick="MsgDeleteOne(crntMess);">delete for myself</li>
-                <li onclick="MsgDelete();">delete for everyone</li>
-                <li onclick="MsgEdit()">edit</li>
-                <li onclick="HidePopup('mine_popup');">cancel</li>
-            </ul>
         </div>
-        <div>
-            <ul class="demo" id="mine_popupPrvt">
-                <li id="msgheadPrvt" class="msheader" style="color:white;background-color:Highlight;margin-top:0px;"></li>               
-                <li onclick="Reply(crntMess, crntUser);">reply</li>
-                <li onclick="ReplyPerson(crntMess, crntUser);">reply to sender personaly</li>
-                <li onclick="StartPrivateChat(crntMess, crntUser);">start a private chat</li>
-                <li onclick="HidePopup('mine_popupPrvt');">cancel</li>
-            </ul>
+
+        <div style="overflow:auto;">
+            <div class="main">
+                <label style="position:relative">Chat users:</label>
+                <div>
+                    <ul class="demo" id="user_popup">
+                        <li id="msgheadUP" class="msheader" style="color:white;background-color:Highlight;margin-top:0px;"></li>
+                        <li onclick="StartPrivateChat(crntMess, crntUser);">start a private chat</li>
+                        <li onclick="HidePopup('user_popup');">cancel</li>
+                    </ul>
+                </div>
+                <div id="chatUsersField"></div>
+
+                <button id="chatJoin" title="Join current chat" onclick="ChatJoin();" style="display:none;">Join chat</button>
+
+            </div>
+            <div class="bottom">
+                <label style="position:relative;">Chat messages:</label>
+                <hr />
+                <div>
+                    <ul class="demo" id="mine_popup">
+                        <li id="msghead" class="msheader" style="color:white;background-color:Highlight;margin-top:0px;"></li>
+                        <li onclick="MsgDeleteOne(crntMess);">delete for myself</li>
+                        <li onclick="MsgDelete();">delete for everyone</li>
+                        <li onclick="MsgEdit()">edit</li>
+                        <li onclick="HidePopup('mine_popup');">cancel</li>
+                    </ul>
+                </div>
+                <div>
+                    <ul class="demo" id="mine_popupPrvt">
+                        <li id="msgheadPrvt" class="msheader" style="color:white;background-color:Highlight;margin-top:0px;"></li>
+                        <li onclick="Reply(crntMess, crntUser);">reply</li>
+                        <li onclick="ReplyPerson(crntMess, crntUser);">reply to sender personaly</li>
+                        <li onclick="StartPrivateChat(crntMess, crntUser);">start a private chat</li>
+                        <li onclick="HidePopup('mine_popupPrvt');">cancel</li>
+                    </ul>
+                </div>
+                <div id="messagefield"></div>
+            </div>
+
         </div>
-        <div id="messagefield"></div>
+        <div class="left" id="usermsg">
+            <p id="hp"></p>
+            <textarea id="usrTxt" style="width:300px;height:50px;overflow:auto;"></textarea>
+            <button id="sendBtn" style="display:none;margin-left:70px;">Send</button>
+            <button id="updateMsg" style="display:none;margin-left:70px;">Ok</button>
+        </div>
     </div>
     <!--
     <div style="padding:5px;">
@@ -89,6 +117,7 @@
 
 
     <script>
+        const base_url = "https://localhost:44367/api/";
         var chats;
         var crntChatId;
         var crntUser;
@@ -124,9 +153,13 @@
         document.getElementById("user_popup").onmouseleave = function () {
             document.getElementById("user_popup").style.display = "none";
         };
+        document.getElementById("regform").onmouseleave = function () {
+            document.getElementById("regform").style.display = "none";
+            document.getElementById("mainform").style.display = "block";
+        };
 
         $(document).ready(function () {
-            $.getJSON('https://localhost:44367/api/chats/', function (object) {
+            $.getJSON(base_url + 'chats/', function (object) {
 
                 chats = object;
                 for (i = 0; i < object.length; i++) {
@@ -163,16 +196,16 @@
                 $.ajax({
                     type: "PUT",
                     data: JSON.stringify(userMessage),
-                    url: "https://localhost:44367/api/chats/" + crntChatId,
+                    url: base_url + "chats/" + crntChatId,
                     crossDomain: true,
                     contentType: "application/json",
                     success: function (data) {
                         $("#usrTxt").val("");
                         ShowUsers();
-                        
+
                     }
-                });                
-               
+                });
+
             }
 
         });
@@ -187,7 +220,7 @@
             $.ajax({
                 type: "POST",
                 data: JSON.stringify(user),
-                url: "https://localhost:44367/api/users",
+                url: base_url + "users",
                 crossDomain: true,
                 contentType: "application/json",
                 success: function (data) {
@@ -201,7 +234,7 @@
 
         function StartPrivateChat(crntMess, crntUser) {
 
-            var scndUser;          
+            var scndUser;
 
             for (var i = 0; i < users.length; i++) {
                 if (users[i].userId == crntMess.userId) {
@@ -219,7 +252,7 @@
             $.ajax({
                 type: "POST",
                 data: JSON.stringify(chat),
-                url: "https://localhost:44367/api/chats",
+                url: base_url + "chats",
                 crossDomain: true,
                 contentType: "application/json",
                 success: function (data) {
@@ -238,7 +271,7 @@
         function ShowUsers() {
             document.getElementById("chatUsersField").innerHTML = '';
 
-            var url = 'https://localhost:44367/api/chats/' + crntChatId + '/users';
+            var url = base_url + 'chats/' + crntChatId + '/users';
             $.get(url, function (object) {
                 users = object;
 
@@ -276,10 +309,10 @@
         }
 
         function ShowMessages() {
-           
+
             document.getElementById("messagefield").innerHTML = '';
 
-            var url = 'https://localhost:44367/api/chats/' + crntChatId + '/messages/';
+            var url = base_url + 'chats/' + crntChatId + '/messages/';
             $.getJSON(url, function (object) {
 
                 chatMessages = object;
@@ -288,10 +321,10 @@
                 for (j = 0; j < chatMessages.length; j++) {
                     for (i = 0; i < users.length; i++) {
                         if (chatMessages[j].userId == users[i].userId) {
-                            if ((chatMessages[j].userId == crntUser.userId) && (chatMessages[j].userNotVisible==true)) {//!MsgExist(chatMessages[j].msgId)) {
+                            if ((chatMessages[j].userId == crntUser.userId) && (chatMessages[j].userNotVisible == true)) {//!MsgExist(chatMessages[j].msgId)) {
                                 continue;
                             }
-                            
+
                             var par = document.createElement("span");
                             par.innerText = users[i].userName + ": ";
 
@@ -310,15 +343,15 @@
                                     }
                                 }
                                 if (crntMsg.userId == crntUser.userId) {
-                                    document.getElementById("msghead").innerHTML = crntMsg.body.substr(0,15)+"...";
+                                    document.getElementById("msghead").innerHTML = crntMsg.body.substr(0, 15) + "...";
                                     document.getElementById("mine_popup").style.display = "block";
-                                    crntMess = crntMsg;                                   
+                                    crntMess = crntMsg;
                                 }
-                                
+
                                 else {
                                     document.getElementById("msgheadPrvt").innerHTML = crntMsg.body.substr(0, 15) + "...";
                                     document.getElementById("mine_popupPrvt").style.display = "block";
-                                    crntMess = crntMsg;    
+                                    crntMess = crntMsg;
                                 }
 
                             });
@@ -331,13 +364,13 @@
 
         function MsgDelete() {
             document.getElementById("mine_popup").style.display = "none";
-            
+
             $.ajax({
-                type: "DELETE",                
-                url: "https://localhost:44367/api/Messages/" + crntMess.msgId,
+                type: "DELETE",
+                url: base_url + "Messages/" + crntMess.msgId,
                 crossDomain: true,
                 contentType: "application/json",
-                success: function (data) {                    
+                success: function (data) {
                     ShowUsers();
                 }
             });
@@ -355,17 +388,17 @@
             $.ajax({
                 type: "PUT",
                 data: JSON.stringify(crntMess),
-                url: "https://localhost:44367/api/Messages/" + crntMess.msgId,
+                url: base_url + "Messages/" + crntMess.msgId,
                 crossDomain: true,
                 contentType: "application/json",
-                success: function (data) {                    
+                success: function (data) {
                     ShowUsers();
                 }
             });
             $("#sendBtn").css("display", "block");
             document.getElementById("updateMsg").style.display = "none";
             $("#usrTxt").val("");
-        }); 
+        });
 
         //function MsgExist(msgId) {
         //    var Msexist = false;
@@ -383,7 +416,7 @@
 
         //function GetCrntUser(userId) {
         //    var user;
-        //    var url = 'https://localhost:44367/api/Users/' + userId;            
+        //    var url = 'https://localhost:44367/api/Users/' + userId;
 
         //    $.get(url, function (object) {
         //        user = object;
@@ -403,20 +436,20 @@
 
         function MsgDeleteOne(CrntMsg) {
             document.getElementById("mine_popup").style.display = "none";
-            
+
             CrntMsg.UserNotVisible = true;
-            
-                $.ajax({
-                    type: "PUT",
-                    data: JSON.stringify(CrntMsg),
-                    url: "https://localhost:44367/api/Messages/" + CrntMsg.msgId,
-                    crossDomain: true,
-                    contentType: "application/json",
-                    success: function (data) {                        
-                        ShowUsers();
-                    }
-                });
-            
+
+            $.ajax({
+                type: "PUT",
+                data: JSON.stringify(CrntMsg),
+                url: base_url + "Messages/" + CrntMsg.msgId,
+                crossDomain: true,
+                contentType: "application/json",
+                success: function (data) {
+                    ShowUsers();
+                }
+            });
+
         }
 
         function HidePopup(id) {
@@ -425,6 +458,34 @@
 
         function ReplyPerson(crntMess, crntUser) {
 
+        }
+
+        function RegisterUser() {
+            document.getElementById("regform").style.display = "block";
+            document.getElementById("mainform").style.display = "none";
+
+        }
+
+        function SubmitForm() {
+            //alert("SubmitForm here!");
+            var fields = $(".ss-item-required")
+                .find("select, textarea, input").serializeArray();
+            var fire = true;
+
+            $.each(fields, function (i, field) {
+                if (!field.value) {
+                    alert(field.name + ' is required');
+                    fire = false;
+                }
+            });
+            console.log(fields);
+            if (fire) {
+                $.each(fields, function (i, field) {
+                    //alert(field.name + " " + field.value + i);
+                    //document.getElementsByName(field.name).innerText = " ";
+                    document.getElementById("field" + i).value = " ";
+                });
+            }
         }
 
     </script>

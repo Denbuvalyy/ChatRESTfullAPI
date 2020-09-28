@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ChatRESTfullAPI.Migrations
 {
     [DbContext(typeof(ChatContext))]
-    [Migration("20200806082930_first")]
-    partial class first
+    [Migration("20200928095628_creation")]
+    partial class creation
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -77,6 +77,12 @@ namespace ChatRESTfullAPI.Migrations
                     b.Property<int>("UserId")
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Email");
+
+                    b.Property<string>("Login");
+
+                    b.Property<string>("Password");
 
                     b.Property<string>("UserName");
 

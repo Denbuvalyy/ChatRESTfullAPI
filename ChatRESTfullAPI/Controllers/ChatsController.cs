@@ -159,7 +159,7 @@ namespace ChatRESTfullAPI.Controllers
         // POST: api/Chats
         [HttpPost]
         public async Task<IActionResult> PostChat([FromBody] Chat chat)
-         {
+        {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
@@ -170,19 +170,32 @@ namespace ChatRESTfullAPI.Controllers
 
             _context.Chats.Add(chat);
             await _context.SaveChangesAsync();
+            //var tempchat= await _context.Chats.Include(m => m.ChatMessages).Include(p => p.ChatUsers)
+            //    .FirstOrDefaultAsync(i => i.ChatId == chat.ChatId);
+            //tempchat.ChatUsers = tempUsers;
 
-            //chat.ChatUsers = tempUsers;
-
-            //for (int i = 0; i < tempUsers.Count; i++)
+            //try
             //{
-            //    ChatUser chatUser = new ChatUser();
-            //    chatUser.Chat = chat;
-            //    var user = await _context.Users.FindAsync(tempUsers[i].UserId);
-            //    chatUser.User = user;
-            //    _context.ChatsUsers.Add(chatUser);
-            //    await _context.SaveChangesAsync();
-            //}
+                
 
+            //    for (int i = 0; i < tempUsers.Count; i++)
+            //    {
+            //        ChatUser chatUser = new ChatUser();
+            //        chatUser.Chat = chat;
+            //        //chatUser.ChatId = chat.ChatId;
+            //        var user = _context.Users.Find(tempUsers[i].UserId);
+            //        chatUser.User = user;
+            //       // chatUser.UserId = tempUsers[i].UserId;
+            //        _context.ChatsUsers.Add(chatUser);
+            //        _context.SaveChanges();
+            //    }
+
+
+            //}
+            //catch(Exception ex)
+            //{
+
+            //}
             //_context.Entry(chat).State = EntityState.Modified;
 
             //try
@@ -195,15 +208,15 @@ namespace ChatRESTfullAPI.Controllers
             //    {
             //        return NotFound();
             //    }
+            
             //    else
-            //    {
-            //        throw;
+            //    {/        throw;
             //    }
             //}
 
-           
 
-            return Ok(chat);
+
+            return Ok(chat);  
             //return CreatedAtAction("GetChat", new { id = chat.ChatId }, chat);
         }
 

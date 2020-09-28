@@ -76,6 +76,12 @@ namespace ChatRESTfullAPI.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<string>("Email");
+
+                    b.Property<string>("Login");
+
+                    b.Property<string>("Password");
+
                     b.Property<string>("UserName");
 
                     b.HasKey("UserId");

@@ -25,17 +25,17 @@ img {
 
 .left {
     float: left;
-    width: 30%;
-    text-align: center;
+    width: 45%;
+    text-align: left;
     padding: 15px;
    
 }
 
-    
+
 
 .main {
     float: left;
-    width: 40%;
+    width: 20%;
     padding: 0px 25px;
     text-align: justify;
 }
@@ -52,12 +52,13 @@ img {
 
 
 .bottom {
-    width:100vw;
+    float:left;
+    width:50vw;
     height:350px;
     padding:20px;
     margin:20px;
-    overflow:auto;
     border:1px solid grey;
+    overflow:auto;
 }  
    
 

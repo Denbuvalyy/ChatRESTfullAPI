@@ -97,14 +97,14 @@ namespace ChatRESTfullAPI.Data
         {
             List<User> users = new List<User>
             {
-                new User{UserName="Sunshy", Login="sunshy", Password="sunshy1234"},
-                new User{UserName="Ann", Login="ann", Password="ann1234"},
-                new User{UserName="Tom", Login="tom", Password="tom1234"},
-                new User{UserName="Grumpy", Login="grumpy", Password="grumpy1234"},
-                new User{UserName="Smiley", Login="smiley", Password="smiley1234"},
-                new User{UserName="The Last", Login="thelast", Password="thelast1234"},
-                new User{UserName="Ficus", Login="ficus", Password="ficus1234"},
-                new User{UserName="Archie", Login="archie", Password="archie1234"}
+                new User{UserName="Sunshy", Email="sunshy@yahoo.com", Password="sunshy1234"},
+                new User{UserName="Ann", Email="ann@yahoo.com", Password="ann1234"},
+                new User{UserName="Tom", Email="tom@yahoo.com", Password="tom1234"},
+                new User{UserName="Grumpy", Email="grumpy@yahoo.com", Password="grumpy1234"},
+                new User{UserName="Smiley", Email="smiley@yahoo.com", Password="smiley1234"},
+                new User{UserName="The Last", Email="thelast@yahoo.com", Password="thelast1234"},
+                new User{UserName="Ficus", Email="ficus@yahoo.com", Password="ficus1234"},
+                new User{UserName="Archie", Email="archie@yahoo.com", Password="archie1234"}
             };
             return users;
         }

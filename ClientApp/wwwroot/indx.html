@@ -8,37 +8,39 @@
     <script src="lib/query/jquery.min.js"></script>
 </head>
 <body>
+    <div class="left ss-item-required" id="loginform" style="margin:10px;padding:10px;width:80vw;height:500px;overflow:auto; border:2px solid black;">
+        Login:
+        <input id="login0" placeholder="login" />
+        <br /><br />
+        Password:
+        <input  id="login1" placeholder="password"/>
+        <br /><br />
+        <button onclick="LoginUser();">Submit</button>
+        <button onclick="RegisterUser();">Register</button>
+    </div>
     <div class="ss-item-required" id="regform" style="margin:10px;padding:10px;width:80vw;height:500px;overflow:auto; border:2px solid black;display:none;">
         <h4>Registration</h4>
         Email:
-        <input id="field0" name="email" placeholder="email"/>
+        <input id="field0" name="email" placeholder="email" />
         <br /><br />
         Login:
-        <input id="field1" name="login" placeholder="login"/>
+        <input id="field1" name="login" placeholder="login" />
         <br /><br />
         Password:
-        <input id="field2" name="password" placeholder="password"/>
+        <input id="field2" name="password" placeholder="password" />
         <br /><br />
         Password:
-        <input id="field3" name="password" placeholder="retype password"/>
+        <input id="field3" name="password" placeholder="retype password" />
         <br /><br />
         <button onclick="SubmitForm();">Register</button>
     </div>
-    <div id="mainform">
+    <div id="mainform" style="display:none;">
         <div style="overflow:auto;">
             <div class="left">
                 <button onclick="setdata()">Create chat</button>
                 <select id="mySelect" autofocus onchange="ChooseOption(this.value);"></select>
             </div>
-            <div class="left">
-                Login:
-                <input />
-                <br /><br />
-                Password:
-                <input />
-                <br /><br />
-                <button onclick="RegisterUser();">Register</button>
-            </div>
+
 
         </div>
 
@@ -82,7 +84,7 @@
             </div>
 
         </div>
-        <div class="left" id="usermsg">
+        <div class="left" id="usermsg" style="display:none;">
             <p id="hp"></p>
             <textarea id="usrTxt" style="width:300px;height:50px;overflow:auto;"></textarea>
             <button id="sendBtn" style="display:none;margin-left:70px;">Send</button>
@@ -158,25 +160,25 @@
             document.getElementById("mainform").style.display = "block";
         };
 
-        $(document).ready(function () {
-            $.getJSON(base_url + 'chats/', function (object) {
+        //$(document).ready(function () {
+        //    $.getJSON(base_url + 'chats/', function (object) {
 
-                chats = object;
-                for (i = 0; i < object.length; i++) {
+        //        chats = object;
+        //        for (i = 0; i < object.length; i++) {
 
-                    var z = document.createElement("option");
-                    z.setAttribute("value", object[i].chatId);
-                    var t = document.createTextNode(object[i].chatName);
-                    z.appendChild(t);
-                    document.getElementById("mySelect").appendChild(z);
-                }
-                document.getElementById("mySelect").options[0].selected = true;
-                document.getElementById("mySelect").onchange();
-            });
+        //            var z = document.createElement("option");
+        //            z.setAttribute("value", object[i].chatId);
+        //            var t = document.createTextNode(object[i].chatName);
+        //            z.appendChild(t);
+        //            document.getElementById("mySelect").appendChild(z);
+        //        }
+        //        document.getElementById("mySelect").options[0].selected = true;
+        //        document.getElementById("mySelect").onchange();
+        //    });
 
-            UserCreate();
+        //    UserCreate();
 
-        });
+        //});
 
 
 
@@ -213,23 +215,23 @@
 
 
 
-        function UserCreate() {
+        //function UserCreate() {
 
-            var user = { username: "Default user", usermessages: null, userchats: null };
+        //    var user = { username: "Default user", usermessages: null, userchats: null };
 
-            $.ajax({
-                type: "POST",
-                data: JSON.stringify(user),
-                url: base_url + "users",
-                crossDomain: true,
-                contentType: "application/json",
-                success: function (data) {
-                    crntUser = data;
-                    $("#hp").html("User: " + "<b>" + crntUser.userName + "</b>");
+        //    $.ajax({
+        //        type: "POST",
+        //        data: JSON.stringify(user),
+        //        url: base_url + "users",
+        //        crossDomain: true,
+        //        contentType: "application/json",
+        //        success: function (data) {
+        //            crntUser = data;
+        //            $("#hp").html("User: " + "<b>" + crntUser.userName + "</b>");
 
-                }
-            });
-        }
+        //        }
+        //    });
+        //}
 
 
         function StartPrivateChat(crntMess, crntUser) {
@@ -306,6 +308,23 @@
 
             });
 
+        }
+
+        function ShowChats() {
+            $.getJSON(base_url + 'chats/', function (object) {
+
+                chats = object;
+                for (i = 0; i < object.length; i++) {
+
+                    var z = document.createElement("option");
+                    z.setAttribute("value", object[i].chatId);
+                    var t = document.createTextNode(object[i].chatName);
+                    z.appendChild(t);
+                    document.getElementById("mySelect").appendChild(z);
+                }
+                document.getElementById("mySelect").options[0].selected = true;
+                document.getElementById("mySelect").onchange();
+            });
         }
 
         function ShowMessages() {
@@ -488,6 +507,38 @@
             }
         }
 
+        function LoginUser() {
+            var fields = $(".ss-item-required")
+                .find("select, textarea, input").serializeArray();
+            var fire = true;
+
+            $.each(fields, function (i, field) {
+                if (!field.value) {
+                    alert(field.name + ' is required');
+                    fire = false;
+                }
+            });
+            console.log(fields);
+            if (fire) {
+                var url = base_url + 'users/' + fields[0];
+                var tempuser;
+                $.get(url, function (object) {
+                    tempuser = object;
+                });
+                if (tempuser.Password == fields[1]) {
+                    document.getElementById("mainform").style.display = "block";
+                    crntUser = tempuser;
+                    $("#hp").html("User: " + "<b>" + crntUser.userName + "</b>");
+                    $.each(fields, function (i, field) {
+                        //alert(field.name + " " + field.value + i);
+                        //document.getElementsByName(field.name).innerText = " ";
+                        document.getElementById("field" + i).value = " ";
+                    });
+                    document.getElementById("loginform").style.display = "none";
+                    ShowChats();
+                }                
+            }
+        }
     </script>
 </body>
 </html>

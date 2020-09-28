@@ -50,9 +50,25 @@ namespace ChatRESTfullAPI.Controllers
             return Ok(user);
         }
 
-       
+       [HttpGet("{email}")]
+       public async Task<IActionResult>GetUser([FromRoute] string email)
+       {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
 
-       
+            var user = await _context.Users.FirstOrDefaultAsync(p => p.Email == email);// FindAsync(id);
+             
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(user);
+       }
+
+
 
         // PUT: api/Users/5
         [HttpPut("{id}")]

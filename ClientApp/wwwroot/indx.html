@@ -8,32 +8,41 @@
     <script src="lib/query/jquery.min.js"></script>
 </head>
 <body>
-    <div class="left ss-item-required" id="loginform" style="margin:10px;padding:10px;width:80vw;height:500px;overflow:auto; border:2px solid black;">
-        Login:
-        <input id="login0" placeholder="login" />
-        <br /><br />
-        Password:
-        <input  id="login1" placeholder="password"/>
-        <br /><br />
-        <button onclick="LoginUser();">Submit</button>
-        <button onclick="RegisterUser();">Register</button>
-    </div>
-    <div class="ss-item-required" id="regform" style="margin:10px;padding:10px;width:80vw;height:500px;overflow:auto; border:2px solid black;display:none;">
-        <h4>Registration</h4>
-        Email:
-        <input id="field0" name="email" placeholder="email" />
-        <br /><br />
-        Login:
-        <input id="field1" name="login" placeholder="login" />
-        <br /><br />
-        Password:
-        <input id="field2" name="password" placeholder="password" />
-        <br /><br />
-        Password:
-        <input id="field3" name="password" placeholder="retype password" />
-        <br /><br />
-        <button onclick="SubmitForm();">Register</button>
-    </div>
+    <fieldset id="loginform">
+
+        <legend>Login to chats</legend>
+        <div class="left" style="margin:10px;padding:10px;width:80vw;height:500px;overflow:auto;">
+            Email:
+            <input id="login0" name="email" placeholder="email" />
+            <br /><br />
+            Password:
+            <input id="login1" name="password" placeholder="password" />
+            <br /><br />
+            <button onclick="LoginUser();">Login</button>
+            <button onclick="RegisterUser();">Register</button>
+        </div>
+    </fieldset>
+    <fieldset id="regform" style="display:none;">
+        <legend>Registration to chats</legend>
+        <div class="ss-item-required" style="margin:10px;padding:10px;width:80vw;height:500px;overflow:auto;">
+            Name:
+            <input id="field0" name="name" placeholder="name" />
+            <br /><br />
+
+            Email:
+            <input id="field1" name="email" placeholder="email" />
+            <br /><br />
+
+            Password:
+            <input id="field2" name="password" placeholder="password" />
+            <br /><br />
+
+            Password:
+            <input id="field3" name="password" placeholder="retype password" />
+            <br /><br />
+            <button onclick="SubmitForm();">Register</button>
+        </div>
+    </fieldset>
     <div id="mainform" style="display:none;">
         <div style="overflow:auto;">
             <div class="left">
@@ -84,33 +93,17 @@
             </div>
 
         </div>
-        <div class="left" id="usermsg" style="display:none;">
-            <p id="hp"></p>
+        <div class="left" id="usermsg">
+            <div style="float:left;">
+                <p id="hp"></p>
+                <button id="logout" onclick="LogOut();">Log out</button>
+            </div>
             <textarea id="usrTxt" style="width:300px;height:50px;overflow:auto;"></textarea>
             <button id="sendBtn" style="display:none;margin-left:70px;">Send</button>
             <button id="updateMsg" style="display:none;margin-left:70px;">Ok</button>
         </div>
     </div>
-    <!--
-    <div style="padding:5px;">
-        <h3>Happy chats</h3>
-        <div style="width:30%;float:left">
-            <select id="mySelect" autofocus onchange="ChooseOption(this.value);"></select>
-        </div>
-        <div style="width:30%;float:left;padding:5px;">
-            <label style="position:relative">Chat users:</label>
-            <div id="chatUsersField" style="width:100px;height:150px;overflow:auto;"></div>
-
-            <button id="chatJoin" title="Join current chat" onclick="ChatJoin();" style="display:none;">Join chat</button>
-            <button onclick="setdata()">Create chat</button>
-
-        </div>
-        <div style="width:40%;float:left">
-            <label style="position:relative">Chat messages:</label>
-            <div id="messagefield" style="width:550px;height:300px;padding:3px;overflow:auto;border:1px solid grey"></div>
-        </div>
-    </div>
-        -->
+   
 
     <pre id="preOutput"></pre>
 
@@ -127,25 +120,7 @@
         var users;
         var crntUserId;
         var crntMess;
-        /*var np = document.createElement("p");
-        np.id = "hp";
-        var div = document.createElement("div");
-        div.appendChild(np);
-        //document.body.appendChild(div);
-        var usrtxt = document.createElement("textarea");
-        usrtxt.style.width = "auto";
-        usrtxt.style.height = "50px";
-        usrtxt.style.overflow = "auto";
-        usrtxt.id = "usrTxt";
-        div.appendChild(usrtxt);
-        var btnSend = document.createElement("button");
-        var descrp = document.createTextNode("Send");
-        btnSend.appendChild(descrp);
-        btnSend.id = "sendBtn";
-        btnSend.style.display = "none";
-        div.appendChild(btnSend);
-        document.getElementById("usermsg").appendChild(div);
-        */
+      
         document.getElementById("mine_popup").onmouseleave = function () {
             document.getElementById("mine_popup").style.display = "none";
         };
@@ -157,7 +132,7 @@
         };
         document.getElementById("regform").onmouseleave = function () {
             document.getElementById("regform").style.display = "none";
-            document.getElementById("mainform").style.display = "block";
+            document.getElementById("loginform").style.display = "block";
         };
 
         //$(document).ready(function () {
@@ -481,12 +456,11 @@
 
         function RegisterUser() {
             document.getElementById("regform").style.display = "block";
-            document.getElementById("mainform").style.display = "none";
+            document.getElementById("loginform").style.display = "none";
 
         }
 
         function SubmitForm() {
-            //alert("SubmitForm here!");
             var fields = $(".ss-item-required")
                 .find("select, textarea, input").serializeArray();
             var fire = true;
@@ -499,45 +473,74 @@
             });
             console.log(fields);
             if (fire) {
-                $.each(fields, function (i, field) {
-                    //alert(field.name + " " + field.value + i);
-                    //document.getElementsByName(field.name).innerText = " ";
-                    document.getElementById("field" + i).value = " ";
-                });
+                if (fields[2].value == fields[3].value) {
+                    var user = { username: fields[0].value, email: fields[1].value, password: fields[2].value, usermessages: null, userchats: null };
+
+                    $.ajax({
+                        type: "POST",
+                        data: JSON.stringify(user),
+                        url: base_url + "users",
+                        crossDomain: true,
+                        contentType: "application/json",
+                        success: function (data) {
+                            crntUser = data;
+                            $("#hp").html("User: " + "<b>" + crntUser.userName + "</b>");
+                            $.each(fields, function (i, field) {
+                                document.getElementById("field" + i).value = " ";
+                            });
+
+                            document.getElementById("loginform").style.display = "none";
+                            document.getElementById("regform").style.display = "none";
+                            ShowChats();
+                            document.getElementById("mainform").style.display = "block";
+                        }
+                    });           
+
+                }
+                else {
+                    alert("password doesn't match!");
+                }
             }
         }
 
         function LoginUser() {
-            var fields = $(".ss-item-required")
-                .find("select, textarea, input").serializeArray();
             var fire = true;
-
-            $.each(fields, function (i, field) {
-                if (!field.value) {
-                    alert(field.name + ' is required');
-                    fire = false;
+            for (var i = 0; i < 2; i++) {
+                if (!document.getElementById("login"+i).value) {
+                    alert(document.getElementById("login" + i).name + ' is  required');
+                    var fire = false;
                 }
-            });
-            console.log(fields);
+            }   
+            
             if (fire) {
-                var url = base_url + 'users/' + fields[0];
+                var url = base_url + 'users/' + document.getElementById("login0").value;
                 var tempuser;
                 $.get(url, function (object) {
                     tempuser = object;
-                });
-                if (tempuser.Password == fields[1]) {
-                    document.getElementById("mainform").style.display = "block";
+                
+                    if (tempuser.password == document.getElementById("login1").value) {
+                    
                     crntUser = tempuser;
-                    $("#hp").html("User: " + "<b>" + crntUser.userName + "</b>");
-                    $.each(fields, function (i, field) {
-                        //alert(field.name + " " + field.value + i);
-                        //document.getElementsByName(field.name).innerText = " ";
-                        document.getElementById("field" + i).value = " ";
-                    });
+                    
+                    for (var i = 0; i < 2; i++) {
+                        document.getElementById("login" + i).value = " ";
+                    }
                     document.getElementById("loginform").style.display = "none";
                     ShowChats();
-                }                
+                    document.getElementById("mainform").style.display = "block";
+                    $("#hp").html("User: " + "<b>" + crntUser.userName + "</b>");
+                    }
+                    else {
+                    alert("wrong credentials!");
+                    }
+                });
             }
+        }
+
+        function LogOut() {
+            crntUser = null;
+            document.getElementById("mainform").style.display = "none";
+            document.getElementById("loginform").style.display = "block";
         }
     </script>
 </body>

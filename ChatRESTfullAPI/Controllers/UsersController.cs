@@ -62,7 +62,7 @@ namespace ChatRESTfullAPI.Controllers
              
             if (user == null)
             {
-                return NotFound();
+                return Ok(user);
             }
 
             return Ok(user);

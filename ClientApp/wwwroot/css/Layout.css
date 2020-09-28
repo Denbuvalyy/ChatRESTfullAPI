@@ -3,7 +3,7 @@
 }
 
 body {
-    margin: 0px;
+    margin: 0;
 }
 
 .specialOne {
@@ -32,11 +32,13 @@ img {
 }
 
 
-
+.login{
+    padding:15px;
+}
 .main {
     float: left;
     width: 20%;
-    padding: 0px 25px;
+    padding: 0 25px;
     text-align: justify;
 }
 
@@ -62,7 +64,7 @@ img {
 }  
    
 
-ul.demo {
+.demo {
     border: 1px grey solid;
     display: none;
     position: absolute;

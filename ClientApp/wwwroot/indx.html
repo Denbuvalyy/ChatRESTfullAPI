@@ -233,12 +233,9 @@
                 crossDomain: true,
                 contentType: "application/json",
                 success: function (data) {
-                    document.getElementById("mySelect").options[chats.length - 1].selected = true;
-                    document.getElementById("mySelect").onchange();
-                    $("#usrTxt").focus();
-                    //chatId = data.chatId;
-                    //alert("chat id is:" + chatId);
-                    //$("#userName").val(chatId);
+                    document.getElementById('mine_popupPrvt').style.display = "none";
+                    ShowChats(chats.length);                    
+                    $("#usrTxt").focus();                    
 
                 }
             });
@@ -266,26 +263,24 @@
                     par.addEventListener("click", function () {
                         document.getElementById("msgheadUP").innerHTML = this.innerHTML.substr(0, 15);
                         document.getElementById("user_popup").style.display = "block";
-                        //if (confirm("You about to start a private chat.")) {
-                        //    document.getElementById("messagefield").innerHTML = '';
-
-                        //}
-                        //alert("User name with id= " + this.id + " clicked");
+                       
                         crntUserId = this.id;
-
 
                     });
                     document.getElementById("chatUsersField").appendChild(par);
 
                 }
                 //GetCrntUser(crntUser.userId);
+                //var myVar = setInterval(ShowMessages, 5000);
+
                 ShowMessages();
 
             });
 
         }
 
-        function ShowChats() {
+        function ShowChats(index = 0) {
+            $("#mySelect").empty();
             $.getJSON(base_url + 'chats/', function (object) {
 
                 chats = object;
@@ -297,7 +292,7 @@
                     z.appendChild(t);
                     document.getElementById("mySelect").appendChild(z);
                 }
-                document.getElementById("mySelect").options[0].selected = true;
+                document.getElementById("mySelect").options[index].selected = true;
                 document.getElementById("mySelect").onchange();
             });
         }
@@ -491,6 +486,7 @@
 
                             document.getElementById("loginform").style.display = "none";
                             document.getElementById("regform").style.display = "none";
+                            
                             ShowChats();
                             document.getElementById("mainform").style.display = "block";
                         }
@@ -517,23 +513,23 @@
                 var tempuser;
                 $.get(url, function (object) {
                     tempuser = object;
-                
-                    if (tempuser.password == document.getElementById("login1").value) {
-                    
-                    crntUser = tempuser;
-                    
-                    for (var i = 0; i < 2; i++) {
-                        document.getElementById("login" + i).value = " ";
-                    }
-                    document.getElementById("loginform").style.display = "none";
-                    ShowChats();
-                    document.getElementById("mainform").style.display = "block";
-                    $("#hp").html("User: " + "<b>" + crntUser.userName + "</b>");
+                    if (tempuser.userId == -1 || tempuser.password != document.getElementById("login1").value) {
+                        alert("wrong credentials!");
                     }
                     else {
-                    alert("wrong credentials!");
-                    }
+
+                        crntUser = tempuser;
+
+                        for (var i = 0; i < 2; i++) {
+                            document.getElementById("login" + i).value = " ";
+                        }
+                        document.getElementById("loginform").style.display = "none";
+                        ShowChats();
+                        document.getElementById("mainform").style.display = "block";
+                        $("#hp").html("User: " + "<b>" + crntUser.userName + "</b>");
+                    }                    
                 });
+
             }
         }
 

@@ -44,7 +44,7 @@ namespace ChatRESTfullAPI.Controllers
 
             if (user == null)
             {
-                return NotFound();
+                return Ok(user);
             }
 
             return Ok(user);
@@ -62,7 +62,9 @@ namespace ChatRESTfullAPI.Controllers
              
             if (user == null)
             {
-                return Ok(user);
+                var tempuser = new User();
+                tempuser.UserId = -1;
+                return Ok(tempuser);
             }
 
             return Ok(user);

@@ -176,20 +176,37 @@ namespace ChatRESTfullAPI.Controllers
 
             //try
             //{
+
+
+            for (int i = 0; i < tempUsers.Count; i++)
+            {
+                ChatUser chatUser = new ChatUser();
+                chatUser.Chat = chat;
+                //chatUser.ChatId = chat.ChatId;
+                var user = _context.Users.Find(tempUsers[i].UserId);
+                chatUser.User = user;
+                // chatUser.UserId = tempUsers[i].UserId;
+                _context.ChatsUsers.Add(chatUser);
+                _context.SaveChanges();
+            }
+
+            _context.Entry(chat).State = EntityState.Modified;
+            _context.SaveChanges();
+            //try
+            //{
                 
-
-            //    for (int i = 0; i < tempUsers.Count; i++)
+            //}
+            //catch (DbUpdateConcurrencyException)
+            //{
+            //    if (!ChatExists(chat.ChatId))
             //    {
-            //        ChatUser chatUser = new ChatUser();
-            //        chatUser.Chat = chat;
-            //        //chatUser.ChatId = chat.ChatId;
-            //        var user = _context.Users.Find(tempUsers[i].UserId);
-            //        chatUser.User = user;
-            //       // chatUser.UserId = tempUsers[i].UserId;
-            //        _context.ChatsUsers.Add(chatUser);
-            //        _context.SaveChanges();
+            //        return NotFound();
             //    }
-
+            //    else
+            //    {
+            //        throw;
+            //    }
+            //}
 
             //}
             //catch(Exception ex)
@@ -208,13 +225,13 @@ namespace ChatRESTfullAPI.Controllers
             //    {
             //        return NotFound();
             //    }
-            
+
             //    else
             //    {/        throw;
             //    }
             //}
-
-
+            //var tempchat = _context.Chats.Find(chat.ChatId);
+            chat.ChatUsers = null;
 
             return Ok(chat);  
             //return CreatedAtAction("GetChat", new { id = chat.ChatId }, chat);

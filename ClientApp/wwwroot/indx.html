@@ -18,7 +18,7 @@
             Password:
             <input id="login1" name="password" placeholder="password" />
             <br /><br />
-            <button onclick="LoginUser();">Login</button>
+            <button onclick="LoginUser();">Login</button>&nbsp;&nbsp;
             <button onclick="RegisterUser();">Register</button>
         </div>
     </fieldset>
@@ -40,7 +40,8 @@
             Password:
             <input id="field3" name="password" placeholder="retype password" />
             <br /><br />
-            <button onclick="SubmitForm();">Register</button>
+            <button onclick="SubmitForm();">Register</button>&nbsp;&nbsp;
+            <button onclick="LeaveRegistration();">Cancel</button>
         </div>
     </fieldset>
     <div id="mainform" style="display:none;">
@@ -120,6 +121,8 @@
         var users;
         var crntUserId;
         var crntMess;
+        var scndUser=0;
+
       
         document.getElementById("mine_popup").onmouseleave = function () {
             document.getElementById("mine_popup").style.display = "none";
@@ -130,10 +133,10 @@
         document.getElementById("user_popup").onmouseleave = function () {
             document.getElementById("user_popup").style.display = "none";
         };
-        document.getElementById("regform").onmouseleave = function () {
-            document.getElementById("regform").style.display = "none";
-            document.getElementById("loginform").style.display = "block";
-        };
+        //document.getElementById("regform").onmouseleave = function () {
+        //    document.getElementById("regform").style.display = "none";
+        //    document.getElementById("loginform").style.display = "block";
+        //};
 
         //$(document).ready(function () {
         //    $.getJSON(base_url + 'chats/', function (object) {
@@ -211,7 +214,6 @@
 
         function StartPrivateChat(crntMess, crntUser) {
 
-            var scndUser;
 
             for (var i = 0; i < users.length; i++) {
                 if (users[i].userId == crntMess.userId) {
@@ -224,7 +226,7 @@
             { "userId": scndUser.userId, "user": scndUser }];
             var chat = {
                 chatname: scndUser.userName + "&" + crntUser.userName, chatmessages: null,
-                chatusers: chatUsers
+                chatusers: chatUsers, private: true
             };
             $.ajax({
                 type: "POST",
@@ -282,15 +284,31 @@
         function ShowChats(index = 0) {
             $("#mySelect").empty();
             $.getJSON(base_url + 'chats/', function (object) {
-
+                var textcolor = "black";
                 chats = object;
                 for (i = 0; i < object.length; i++) {
+                    if (object[i].private) {
+                        if (object[i].chatUsers[0].userId != crntUser.userId && object[i].chatUsers[1].userId != scndUser.userId) {
+                            continue;
+                        }
+                        else {
+                            textcolor = "blue";
+                        }
+                    }
+                    else {
+                        textcolor = "black";
+                    }
+                    var option = document.createElement("option");
+                    option.setAttribute("value", object[i].chatId);
+                    var opttext = document.createTextNode(object[i].chatName);
+                    option.appendChild(opttext);
+                    document.getElementById("mySelect").appendChild(option);
+                    document.getElementById("mySelect").options[document.getElementById("mySelect").length - 1].style.color=textcolor;
 
-                    var z = document.createElement("option");
-                    z.setAttribute("value", object[i].chatId);
-                    var t = document.createTextNode(object[i].chatName);
-                    z.appendChild(t);
-                    document.getElementById("mySelect").appendChild(z);
+                }
+
+                if (index != 0) {
+                    index = document.getElementById("mySelect").length - 1;
                 }
                 document.getElementById("mySelect").options[index].selected = true;
                 document.getElementById("mySelect").onchange();
@@ -348,6 +366,8 @@
                         }
                     }
                 }
+                $("#usrTxt").focus();                    
+
             });
         }
 
@@ -483,12 +503,13 @@
                             $.each(fields, function (i, field) {
                                 document.getElementById("field" + i).value = " ";
                             });
-
-                            document.getElementById("loginform").style.display = "none";
-                            document.getElementById("regform").style.display = "none";
+                            
                             
                             ShowChats();
                             document.getElementById("mainform").style.display = "block";
+                            document.getElementById("regform").style.display = "none";
+
+                            document.getElementById("loginform").style.display = "none";
                         }
                     });           
 
@@ -527,10 +548,17 @@
                         ShowChats();
                         document.getElementById("mainform").style.display = "block";
                         $("#hp").html("User: " + "<b>" + crntUser.userName + "</b>");
+
                     }                    
                 });
 
             }
+        }
+
+        function LeaveRegistration() {
+            document.getElementById("regform").style.display = "none";
+            document.getElementById("loginform").style.display = "block";
+
         }
 
         function LogOut() {

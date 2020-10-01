@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ChatRESTfullAPI.Migrations
 {
     [DbContext(typeof(ChatContext))]
-    [Migration("20200928103611_usermodified")]
-    partial class usermodified
+    [Migration("20200930160913_chatModified")]
+    partial class chatModified
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -28,6 +28,8 @@ namespace ChatRESTfullAPI.Migrations
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("ChatName");
+
+                    b.Property<bool>("Private");
 
                     b.HasKey("ChatId");
 

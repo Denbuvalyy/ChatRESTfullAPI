@@ -27,6 +27,8 @@ namespace ChatRESTfullAPI.Migrations
 
                     b.Property<string>("ChatName");
 
+                    b.Property<bool>("Private");
+
                     b.HasKey("ChatId");
 
                     b.ToTable("Chats");

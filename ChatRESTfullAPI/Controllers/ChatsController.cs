@@ -26,9 +26,49 @@ namespace ChatRESTfullAPI.Controllers
         // GET: api/Chats
         [HttpGet]
         public IEnumerable<Chat> GetChats()
-        {         
+        {
+            List<Chat> chats = null;
+            chats = _context.Chats.Include(u => u.ChatUsers).ToList();
+            //try
+            //{
 
-            return _context.Chats;
+
+            //    chats = _context.Chats.Include(u => u.ChatUsers).ToList();
+
+
+            //    foreach(var chat in chats)
+            //    {
+            //        foreach (ChatUser chatU in chat.ChatUsers)
+            //        {
+            //            chatU.Chat = null;
+            //        }
+            //    }
+
+            //}
+            //catch(Exception e)
+            //{
+
+            //}
+            //return chats;
+
+
+            for (int i=0;i<chats.Count;i++)
+            {
+                if(!chats[i].Private)
+                {
+                    chats[i].ChatUsers = null;
+                }
+                else
+                {
+                    var chatusers = chats[i].ChatUsers.ToList();
+                    for(int j=0;j<chatusers.Count;j++)
+                    {                        
+                        chatusers[j].Chat = null;
+                    }
+                    chats[i].ChatUsers = chatusers;
+                }
+            }
+            return chats;
         }
 
         // GET: api/Chats/5

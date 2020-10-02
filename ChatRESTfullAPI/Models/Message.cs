@@ -15,5 +15,6 @@ namespace ChatRESTfullAPI.Models
         public int UserId { get; set; }        
         public int ChatId { get; set; }
         public bool UserNotVisible { get; set; }
+        public bool IsReply { get; set; } 
     }
 }

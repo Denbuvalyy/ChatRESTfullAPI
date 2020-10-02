@@ -56,9 +56,9 @@ img {
 .bottom {
     float:left;
     width:50vw;
-    height:auto;
-    padding:20px;
-    margin:20px;
+    height:400px;
+    padding:10px;
+    margin:10px;
     border:1px solid grey;
     overflow:auto;
 }  
@@ -91,6 +91,35 @@ ul li:hover {
 
 .msheader:hover {
     background-color:Highlight;
+}
+
+.publicMsgs {
+    border:1px solid blue;
+    border-radius:20px;
+    background-color:lightgray;
+    float:left;
+    width:70%;
+    padding:10px;
+    margin:5px;
+}
+
+.personalMsgs {
+    border: 1px solid grey;
+    border-radius: 20px;
+    background-color:lightblue ;
+    float: right;
+    width: 70%;
+    padding: 10px;
+}
+
+.replyMsgHead {
+    border: 1px solid grey;
+    border-radius:20px;
+    color:darkblue;
+    background-color:lightgray; 
+    font-size:12px;
+    padding:5px;
+    margin-bottom:5px;
 }
 
 @media only screen and (max-width:620px) {

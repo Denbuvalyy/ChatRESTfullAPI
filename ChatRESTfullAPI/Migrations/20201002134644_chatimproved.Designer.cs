@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ChatRESTfullAPI.Migrations
 {
     [DbContext(typeof(ChatContext))]
-    [Migration("20200930160913_chatModified")]
-    partial class chatModified
+    [Migration("20201002134644_chatimproved")]
+    partial class chatimproved
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -60,6 +60,8 @@ namespace ChatRESTfullAPI.Migrations
                     b.Property<int>("ChatId");
 
                     b.Property<DateTime>("CreationTime");
+
+                    b.Property<bool>("IsReply");
 
                     b.Property<int>("UserId");
 

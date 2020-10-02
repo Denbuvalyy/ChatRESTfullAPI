@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace ChatRESTfullAPI.Migrations
 {
-    public partial class chatUpdated : Migration
+    public partial class chatimproved : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -15,9 +15,7 @@ namespace ChatRESTfullAPI.Migrations
                     ChatId = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     ChatName = table.Column<string>(nullable: true),
-                    Private = table.Column<bool>(nullable: false),
-                    FrstUsrId = table.Column<int>(nullable: false),
-                    ScndUsrId = table.Column<int>(nullable: false)
+                    Private = table.Column<bool>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -73,7 +71,8 @@ namespace ChatRESTfullAPI.Migrations
                     Body = table.Column<string>(nullable: true),
                     UserId = table.Column<int>(nullable: false),
                     ChatId = table.Column<int>(nullable: false),
-                    UserNotVisible = table.Column<bool>(nullable: false)
+                    UserNotVisible = table.Column<bool>(nullable: false),
+                    IsReply = table.Column<bool>(nullable: false)
                 },
                 constraints: table =>
                 {

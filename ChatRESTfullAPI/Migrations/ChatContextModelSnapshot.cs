@@ -59,6 +59,8 @@ namespace ChatRESTfullAPI.Migrations
 
                     b.Property<DateTime>("CreationTime");
 
+                    b.Property<bool>("IsReply");
+
                     b.Property<int>("UserId");
 
                     b.Property<bool>("UserNotVisible");

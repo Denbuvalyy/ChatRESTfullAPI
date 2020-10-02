@@ -19,7 +19,7 @@
             <input id="login1" name="password" placeholder="password" />
             <br /><br />
             <button onclick="LoginUser();">Login</button>&nbsp;&nbsp;
-            <button onclick="RegisterUser();">Register</button>
+            <button onclick="ShowRegistration();">Register</button>
         </div>
     </fieldset>
     <fieldset id="regform" style="display:none;">
@@ -44,11 +44,12 @@
             <button onclick="LeaveRegistration();">Cancel</button>
         </div>
     </fieldset>
+
     <div id="mainform" style="display:none;">
         <div style="overflow:auto;">
             <div class="left">
                 <button onclick="setdata()">Create chat</button>
-                <select id="mySelect" autofocus onchange="ChooseOption(this.value);"></select>
+                <select id="ChatSelect" autofocus onchange="ChooseOption(this.value);"></select>
             </div>
 
 
@@ -84,7 +85,7 @@
                 <div>
                     <ul class="demo" id="mine_popupPrvt">
                         <li id="msgheadPrvt" class="msheader" style="color:white;background-color:Highlight;margin-top:0px;"></li>
-                        <li onclick="Reply(crntMess, crntUser);">reply</li>
+                        <li onclick="PublicReply(crntMess, crntUser);">reply</li>
                         <li onclick="ReplyPerson(crntMess, crntUser);">reply to sender personaly</li>
                         <li onclick="StartPrivateChat(crntMess, crntUser);">start a private chat</li>
                         <li onclick="HidePopup('mine_popupPrvt');">cancel</li>
@@ -99,9 +100,16 @@
                 <p id="hp"></p>
                 <button id="logout" onclick="LogOut();">Log out</button>
             </div>
-            <textarea id="usrTxt" style="width:300px;height:50px;overflow:auto;"></textarea>
-            <button id="sendBtn" style="display:none;margin-left:70px;">Send</button>
-            <button id="updateMsg" style="display:none;margin-left:70px;">Ok</button>
+            <div style="display:inline-block;">
+                <div id="MsgFld" style="border:1px solid blue;border-radius:50px 20px;display:none;margin:5px; padding:10px;background-color:lightgray;"></div>
+                <textarea id="usrTxt" style="width:300px;height:50px;overflow:auto;"></textarea>
+            </div>
+            <div>
+                <button id="PrsnlRplBtn" onclick="PersonalReply(crntUser)" style="display:none;">Reply</button>
+                <button id="CancelRplBtn" onclick="ReplyCancel();"style="display:none;">Cancel</button>
+                <button id="sendBtn" style="display:none;margin-left:70px;">Send</button>
+                <button id="updateMsg" style="display:none;margin-left:70px;">Ok</button>
+            </div>
         </div>
     </div>
    
@@ -133,32 +141,7 @@
         document.getElementById("user_popup").onmouseleave = function () {
             document.getElementById("user_popup").style.display = "none";
         };
-        //document.getElementById("regform").onmouseleave = function () {
-        //    document.getElementById("regform").style.display = "none";
-        //    document.getElementById("loginform").style.display = "block";
-        //};
-
-        //$(document).ready(function () {
-        //    $.getJSON(base_url + 'chats/', function (object) {
-
-        //        chats = object;
-        //        for (i = 0; i < object.length; i++) {
-
-        //            var z = document.createElement("option");
-        //            z.setAttribute("value", object[i].chatId);
-        //            var t = document.createTextNode(object[i].chatName);
-        //            z.appendChild(t);
-        //            document.getElementById("mySelect").appendChild(z);
-        //        }
-        //        document.getElementById("mySelect").options[0].selected = true;
-        //        document.getElementById("mySelect").onchange();
-        //    });
-
-        //    UserCreate();
-
-        //});
-
-
+        
 
         function ChooseOption(selValue) {
             crntChatId = selValue;
@@ -167,6 +150,7 @@
 
             $("#sendBtn").css("display", "block");
         }
+
 
         $("#sendBtn").click(function () {
             if ($("#usrTxt").val() == "") { alert("Message can't be blank!"); }
@@ -182,38 +166,13 @@
                     success: function (data) {
                         $("#usrTxt").val("");
                         ShowUsers();
-
                     }
                 });
-
             }
-
-        });
-
-
-
-
-        //function UserCreate() {
-
-        //    var user = { username: "Default user", usermessages: null, userchats: null };
-
-        //    $.ajax({
-        //        type: "POST",
-        //        data: JSON.stringify(user),
-        //        url: base_url + "users",
-        //        crossDomain: true,
-        //        contentType: "application/json",
-        //        success: function (data) {
-        //            crntUser = data;
-        //            $("#hp").html("User: " + "<b>" + crntUser.userName + "</b>");
-
-        //        }
-        //    });
-        //}
+        });       
 
 
         function StartPrivateChat(crntMess, crntUser) {
-
 
             for (var i = 0; i < users.length; i++) {
                 if (users[i].userId == crntMess.userId) {
@@ -238,11 +197,10 @@
                     document.getElementById('mine_popupPrvt').style.display = "none";
                     ShowChats(chats.length);                    
                     $("#usrTxt").focus();                    
-
                 }
             });
-
         }
+
 
         function ShowUsers() {
             document.getElementById("chatUsersField").innerHTML = '';
@@ -270,19 +228,16 @@
 
                     });
                     document.getElementById("chatUsersField").appendChild(par);
-
                 }
-                //GetCrntUser(crntUser.userId);
                 //var myVar = setInterval(ShowMessages, 5000);
 
                 ShowMessages();
-
             });
-
         }
 
+
         function ShowChats(index = 0) {
-            $("#mySelect").empty();
+            $("#ChatSelect").empty();
             $.getJSON(base_url + 'chats/', function (object) {
                 var textcolor = "black";
                 chats = object;
@@ -302,18 +257,19 @@
                     option.setAttribute("value", object[i].chatId);
                     var opttext = document.createTextNode(object[i].chatName);
                     option.appendChild(opttext);
-                    document.getElementById("mySelect").appendChild(option);
-                    document.getElementById("mySelect").options[document.getElementById("mySelect").length - 1].style.color=textcolor;
+                    document.getElementById("ChatSelect").appendChild(option);
+                    document.getElementById("ChatSelect").options[document.getElementById("ChatSelect").length - 1].style.color=textcolor;
 
                 }
 
                 if (index != 0) {
-                    index = document.getElementById("mySelect").length - 1;
+                    index = document.getElementById("ChatSelect").length - 1;
                 }
-                document.getElementById("mySelect").options[index].selected = true;
-                document.getElementById("mySelect").onchange();
+                document.getElementById("ChatSelect").options[index].selected = true;
+                document.getElementById("ChatSelect").onchange();
             });
         }
+
 
         function ShowMessages() {
 
@@ -328,20 +284,38 @@
                 for (j = 0; j < chatMessages.length; j++) {
                     for (i = 0; i < users.length; i++) {
                         if (chatMessages[j].userId == users[i].userId) {
-                            if ((chatMessages[j].userId == crntUser.userId) && (chatMessages[j].userNotVisible == true)) {//!MsgExist(chatMessages[j].msgId)) {
+                            if ((chatMessages[j].userId == crntUser.userId) && (chatMessages[j].userNotVisible == true)) {
                                 continue;
+                            }
+
+                            var MsgFld = document.createElement("div");
+                            MsgFld.classList.add('publicMsgs');
+
+                            let MsgBody = chatMessages[j].body;
+                            if (chatMessages[j].isReply) {
+                                var replFld = document.createElement("div");
+                                replFld.classList.add("replyMsgHead");
+                                replFld.innerHTML = MsgBody.substr(0, 23);
+                                MsgBody = MsgBody.substr(23);
+                                MsgFld.appendChild(replFld);
                             }
 
                             var par = document.createElement("span");
                             par.innerText = users[i].userName + ": ";
 
                             par.style.color = "red";
-                            document.getElementById("messagefield").appendChild(par);
+
+                            
+                            MsgFld.appendChild(par);
+                            if (chatMessages[j].userId == crntUser.userId) {
+                                MsgFld.classList.add("personalMsgs");
+                            }
+                            //document.getElementById("messagefield").appendChild(par);
                             par = document.createElement("span");
-                            par.innerText = "   " + chatMessages[j].body + "\n";
+                            par.innerText = "   " + MsgBody + "\n";
                             par.style.fontStyle = "italic";
-                            par.id = chatMessages[j].msgId;
-                            par.addEventListener("click", function () {
+                            MsgFld.id = chatMessages[j].msgId;
+                            MsgFld.addEventListener("click", function () {
                                 var crntMsg;
                                 for (j = 0; j < chatMessages.length; j++) {
                                     if (chatMessages[j].msgId == this.id) {
@@ -362,7 +336,15 @@
                                 }
 
                             });
-                            document.getElementById("messagefield").appendChild(par);
+                            
+                            MsgFld.appendChild(par);
+                            var timeFld = document.createElement("span");
+                            timeFld.style.fontSize = "10px";
+                            timeFld.innerText = chatMessages[j].creationTime.substring(11, 16);
+                            timeFld.style.cssFloat = "right";
+                            MsgFld.appendChild(timeFld);
+                            //document.getElementById("messagefield").appendChild(par);b
+                            document.getElementById("messagefield").appendChild(MsgFld);
                         }
                     }
                 }
@@ -370,6 +352,7 @@
 
             });
         }
+
 
         function MsgDelete() {
             document.getElementById("mine_popup").style.display = "none";
@@ -385,12 +368,14 @@
             });
         }
 
+
         function MsgEdit() {
             document.getElementById("mine_popup").style.display = "none";
             document.getElementById("usrTxt").value = crntMess.body;
             $("#sendBtn").css("display", "none");
             document.getElementById("updateMsg").style.display = "block";
         }
+
 
         $("#updateMsg").click(function () {
             crntMess.body = $("#usrTxt").val();
@@ -408,40 +393,7 @@
             document.getElementById("updateMsg").style.display = "none";
             $("#usrTxt").val("");
         });
-
-        //function MsgExist(msgId) {
-        //    var Msexist = false;
-        //    if (crntUser.userMessages != null) {
-        //        var msglist = crntUser.userMessages;
-        //        for (i = 0; i < msglist.length; i++) {
-        //            if (msglist[i].msgId == msgId) {
-        //                Msexist = true;
-        //                break;
-        //            }
-        //        }
-        //    }
-        //    return Msexist;
-        //}
-
-        //function GetCrntUser(userId) {
-        //    var user;
-        //    var url = 'https://localhost:44367/api/Users/' + userId;
-
-        //    $.get(url, function (object) {
-        //        user = object;
-        //    });
-        //    //$.ajax({
-        //    //    type: "GET",
-        //    //    url: url,
-        //    //    crossDomain: true,
-        //    //    contentType: "application/json",
-        //    //    success: function (data) {
-        //    //        user = data;
-
-        //    //    }
-        //    //});
-        //    return user;
-        //}
+              
 
         function MsgDeleteOne(CrntMsg) {
             document.getElementById("mine_popup").style.display = "none";
@@ -461,15 +413,72 @@
 
         }
 
+
         function HidePopup(id) {
             document.getElementById(id).style.display = "none";
         }
 
-        function ReplyPerson(crntMess, crntUser) {
+
+        function PublicReply(crntMess, crntUser) {
+            document.getElementById("mine_popupPrvt").style.display = "none";
+            $("#usrTxt").val("");
+            document.getElementById('MsgFld').innerHTML = document.getElementById(crntMess.msgId).innerText.substr(0, 20) + "...";
+            document.getElementById('MsgFld').style.display = "block";       
+            $("#usrTxt").focus();
+            $('#PrsnlRplBtn').show();
+            $('#CancelRplBtn').show();
+            $('#sendBtn').hide();
+        }
+
+
+        $('#CancelRplBtn').click(function () {
+            $('#PrsnlRplBtn').hide();
+            $('#CancelRplBtn').hide();
+            $('#sendBtn').show();
+            document.getElementById('MsgFld').style.display = "none"; 
+            $("#usrTxt").val("");
+            $("#usrTxt").focus();
+        });
+
+
+        $('#PrsnlRplBtn').click(function () {
+
+            if ($("#usrTxt").val() == "") { alert("Message can't be blank!"); }
+            else {
+
+                var userMessage = {
+                    body: document.getElementById('MsgFld').innerText + $("#usrTxt").val(), creationTime: new Date(),
+                    chatId: crntChatId, userId: crntUser.userId, isReply: true
+                };
+                $('#PrsnlRplBtn').hide();
+                $('#CancelRplBtn').hide();
+                $('#sendBtn').show();
+                document.getElementById('MsgFld').innerHTML = ""; 
+                document.getElementById('MsgFld').style.display = "none";
+                $("#usrTxt").val("");
+
+                $.ajax({
+                    type: "POST",
+                    data: JSON.stringify(userMessage),
+                    url: base_url + "Messages/",
+                    crossDomain: true,
+                    contentType: "application/json",
+                    success: function (data) {
+                        $("#usrTxt").val("");
+                        ShowUsers();
+                    }
+                });
+            }
+
+        });
+
+
+        function PersonalReply(crntMess, crntUser) {
 
         }
 
-        function RegisterUser() {
+
+        function ShowRegistration() {
             document.getElementById("regform").style.display = "block";
             document.getElementById("loginform").style.display = "none";
 
@@ -538,7 +547,6 @@
                         alert("wrong credentials!");
                     }
                     else {
-
                         crntUser = tempuser;
 
                         for (var i = 0; i < 2; i++) {
@@ -548,17 +556,14 @@
                         ShowChats();
                         document.getElementById("mainform").style.display = "block";
                         $("#hp").html("User: " + "<b>" + crntUser.userName + "</b>");
-
                     }                    
                 });
-
             }
         }
 
         function LeaveRegistration() {
             document.getElementById("regform").style.display = "none";
             document.getElementById("loginform").style.display = "block";
-
         }
 
         function LogOut() {

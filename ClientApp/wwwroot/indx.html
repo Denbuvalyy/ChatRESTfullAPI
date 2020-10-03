@@ -45,10 +45,23 @@
         </div>
     </fieldset>
 
+    <fieldset id="chatcreationform" style="display:none;">
+        <legend>New Chat</legend>
+        <div style="margin:10px;padding:10px;width:80vw;height:500px;overflow:auto;">
+            
+            Caption:
+            <input id="chatname" name="name" placeholder="Chat caption" />
+            <br /><br />            
+            
+            <button onclick="CreateChat();">Create</button>&nbsp;&nbsp;
+            <button onclick="LeaveChtCreation();">Cancel</button>
+        </div>
+    </fieldset>
+
     <div id="mainform" style="display:none;">
         <div style="overflow:auto;">
             <div class="left">
-                <button onclick="setdata()">Create chat</button>
+                <button onclick="ChatCreation()">Create chat</button>
                 <select id="ChatSelect" autofocus onchange="ChooseOption(this.value);"></select>
             </div>
 
@@ -61,7 +74,7 @@
                 <div>
                     <ul class="demo" id="user_popup">
                         <li id="msgheadUP" class="msheader" style="color:white;background-color:Highlight;margin-top:0px;"></li>
-                        <li onclick="StartPrivateChat(crntMess, crntUser);">start a private chat</li>
+                        <li onclick="StartPrivateChat(scndUserId, crntUser);">start a private chat</li>
                         <li onclick="HidePopup('user_popup');">cancel</li>
                     </ul>
                 </div>
@@ -85,9 +98,9 @@
                 <div>
                     <ul class="demo" id="mine_popupPrvt">
                         <li id="msgheadPrvt" class="msheader" style="color:white;background-color:Highlight;margin-top:0px;"></li>
-                        <li onclick="PublicReply(crntMess, crntUser);">reply</li>
-                        <li onclick="ReplyPerson(crntMess, crntUser);">reply to sender personaly</li>
-                        <li onclick="StartPrivateChat(crntMess, crntUser);">start a private chat</li>
+                        <li onclick="PublicReply(crntMess);">reply</li>
+                        <li onclick="PersonalReply(crntMess, crntUser);">reply to sender personaly</li>
+                        <li onclick="StartPrivateChat(crntMess.userId, crntUser);">start a private chat</li>
                         <li onclick="HidePopup('mine_popupPrvt');">cancel</li>
                     </ul>
                 </div>
@@ -105,14 +118,14 @@
                 <textarea id="usrTxt" style="width:300px;height:50px;overflow:auto;"></textarea>
             </div>
             <div>
-                <button id="PrsnlRplBtn" onclick="PersonalReply(crntUser)" style="display:none;">Reply</button>
-                <button id="CancelRplBtn" onclick="ReplyCancel();"style="display:none;">Cancel</button>
+                <button id="PrsnlRplBtn" style="display:none;">Reply</button>
+                <button id="CancelRplBtn" style="display:none;">Cancel</button>
                 <button id="sendBtn" style="display:none;margin-left:70px;">Send</button>
                 <button id="updateMsg" style="display:none;margin-left:70px;">Ok</button>
             </div>
         </div>
     </div>
-   
+
 
     <pre id="preOutput"></pre>
 
@@ -127,11 +140,12 @@
         var crntUser;
         var chatMessages;
         var users;
-        var crntUserId;
+        var scndUserId;
         var crntMess;
-        var scndUser=0;
+        var scndUser = 0;
+        let AdrstMsg;
 
-      
+
         document.getElementById("mine_popup").onmouseleave = function () {
             document.getElementById("mine_popup").style.display = "none";
         };
@@ -141,7 +155,7 @@
         document.getElementById("user_popup").onmouseleave = function () {
             document.getElementById("user_popup").style.display = "none";
         };
-        
+
 
         function ChooseOption(selValue) {
             crntChatId = selValue;
@@ -169,13 +183,46 @@
                     }
                 });
             }
-        });       
+        });
 
 
-        function StartPrivateChat(crntMess, crntUser) {
+        function ChatCreation() {
+            $('#mainform').hide();
+            $('#chatcreationform').show();
+            $('#chatname').focus();
+        }
+
+
+        function CreateChat() {
+            if ($('#chatname').val() == "") { alert("Chat caption can't be blank!"); }
+            else {
+                var chatUsers = [{ "userId": crntUser.userId, "user": crntUser }];
+
+                var chat = {
+                    chatname: $('#chatname').val(), chatmessages: null,
+                    chatusers: chatUsers, 
+                };
+                $.ajax({
+                    type: "POST",
+                    data: JSON.stringify(chat),
+                    url: base_url + "chats",
+                    crossDomain: true,
+                    contentType: "application/json",
+                    success: function (data) {
+                        $('#chatcreationform').hide();
+                        $('#mainform').show();
+
+                        ShowChats(chats.length);
+                        $("#usrTxt").focus();
+                    }
+                });
+            }
+        }
+
+        function StartPrivateChat(scndUsrId, crntUser) {
 
             for (var i = 0; i < users.length; i++) {
-                if (users[i].userId == crntMess.userId) {
+                if (users[i].userId == scndUsrId) {
                     scndUser = users[i];
                     break;
                 }
@@ -184,7 +231,7 @@
             var chatUsers = [{ "userId": crntUser.userId, "user": crntUser },
             { "userId": scndUser.userId, "user": scndUser }];
             var chat = {
-                chatname: scndUser.userName + "&" + crntUser.userName, chatmessages: null,
+                chatname: crntUser.userName + "&" + scndUser.userName, chatmessages: null,
                 chatusers: chatUsers, private: true
             };
             $.ajax({
@@ -195,8 +242,9 @@
                 contentType: "application/json",
                 success: function (data) {
                     document.getElementById('mine_popupPrvt').style.display = "none";
-                    ShowChats(chats.length);                    
-                    $("#usrTxt").focus();                    
+                    document.getElementById("user_popup").style.display = "none";
+                    ShowChats(chats.length);
+                    $("#usrTxt").focus();
                 }
             });
         }
@@ -223,8 +271,8 @@
                     par.addEventListener("click", function () {
                         document.getElementById("msgheadUP").innerHTML = this.innerHTML.substr(0, 15);
                         document.getElementById("user_popup").style.display = "block";
-                       
-                        crntUserId = this.id;
+
+                        scndUserId = this.id;
 
                     });
                     document.getElementById("chatUsersField").appendChild(par);
@@ -243,7 +291,8 @@
                 chats = object;
                 for (i = 0; i < object.length; i++) {
                     if (object[i].private) {
-                        if (object[i].chatUsers[0].userId != crntUser.userId && object[i].chatUsers[1].userId != scndUser.userId) {
+                        //if (object[i].chatUsers[0].userId != crntUser.userId && object[i].chatUsers[1].userId != scndUserId) {
+                        if (object[i].chatUsers[0].userId != crntUser.userId && object[i].chatUsers[1].userId != crntUser.userId) {
                             continue;
                         }
                         else {
@@ -258,7 +307,7 @@
                     var opttext = document.createTextNode(object[i].chatName);
                     option.appendChild(opttext);
                     document.getElementById("ChatSelect").appendChild(option);
-                    document.getElementById("ChatSelect").options[document.getElementById("ChatSelect").length - 1].style.color=textcolor;
+                    document.getElementById("ChatSelect").options[document.getElementById("ChatSelect").length - 1].style.color = textcolor;
 
                 }
 
@@ -305,7 +354,7 @@
 
                             par.style.color = "red";
 
-                            
+
                             MsgFld.appendChild(par);
                             if (chatMessages[j].userId == crntUser.userId) {
                                 MsgFld.classList.add("personalMsgs");
@@ -336,7 +385,7 @@
                                 }
 
                             });
-                            
+
                             MsgFld.appendChild(par);
                             var timeFld = document.createElement("span");
                             timeFld.style.fontSize = "10px";
@@ -348,7 +397,7 @@
                         }
                     }
                 }
-                $("#usrTxt").focus();                    
+                $("#usrTxt").focus();
 
             });
         }
@@ -371,14 +420,24 @@
 
         function MsgEdit() {
             document.getElementById("mine_popup").style.display = "none";
-            document.getElementById("usrTxt").value = crntMess.body;
+            if (crntMess.isReply) {
+                document.getElementById("usrTxt").value = crntMess.body.substr(23);
+            }
+            else {
+                document.getElementById("usrTxt").value = crntMess.body;
+            }
             $("#sendBtn").css("display", "none");
             document.getElementById("updateMsg").style.display = "block";
         }
 
 
         $("#updateMsg").click(function () {
-            crntMess.body = $("#usrTxt").val();
+            if (crntMess.isReply) {
+                crntMess.body = crntMess.body.substr(0, 23) + $("#usrTxt").val();
+            }
+            else {
+                crntMess.body = $("#usrTxt").val();
+            }
             $.ajax({
                 type: "PUT",
                 data: JSON.stringify(crntMess),
@@ -393,7 +452,7 @@
             document.getElementById("updateMsg").style.display = "none";
             $("#usrTxt").val("");
         });
-              
+
 
         function MsgDeleteOne(CrntMsg) {
             document.getElementById("mine_popup").style.display = "none";
@@ -419,11 +478,23 @@
         }
 
 
-        function PublicReply(crntMess, crntUser) {
+        function PublicReply(crntMess) {
+
             document.getElementById("mine_popupPrvt").style.display = "none";
             $("#usrTxt").val("");
-            document.getElementById('MsgFld').innerHTML = document.getElementById(crntMess.msgId).innerText.substr(0, 20) + "...";
-            document.getElementById('MsgFld').style.display = "block";       
+            //document.getElementById('MsgFld').innerHTML =
+            AdrstMsg = document.getElementById(crntMess.msgId).innerText;//.substr(0, 20) + "...";
+            AdrstMsg = AdrstMsg.substr(0, AdrstMsg.length - 5);
+            if (AdrstMsg.length >= 20) {
+                AdrstMsg = AdrstMsg.substr(0, 20) + "...";
+            }
+            else {
+                var suffix = 20 - AdrstMsg.length;
+                AdrstMsg = AdrstMsg + "..." + " ".repeat(suffix);
+
+            }
+            document.getElementById('MsgFld').innerHTML = AdrstMsg;
+            document.getElementById('MsgFld').style.display = "block";
             $("#usrTxt").focus();
             $('#PrsnlRplBtn').show();
             $('#CancelRplBtn').show();
@@ -431,11 +502,18 @@
         }
 
 
+        function PersonalReply(crntMsg, crntUser) {
+
+            PublicReply(crntMsg);
+            StartPrivateChat(crntMsg.userId, crntUser);
+            $('#sendBtn').hide();
+        }
+
         $('#CancelRplBtn').click(function () {
             $('#PrsnlRplBtn').hide();
             $('#CancelRplBtn').hide();
             $('#sendBtn').show();
-            document.getElementById('MsgFld').style.display = "none"; 
+            document.getElementById('MsgFld').style.display = "none";
             $("#usrTxt").val("");
             $("#usrTxt").focus();
         });
@@ -447,20 +525,20 @@
             else {
 
                 var userMessage = {
-                    body: document.getElementById('MsgFld').innerText + $("#usrTxt").val(), creationTime: new Date(),
-                    chatId: crntChatId, userId: crntUser.userId, isReply: true
+                    body: AdrstMsg + $("#usrTxt").val(),
+                    creationTime: new Date(), chatId: crntChatId, userId: crntUser.userId, isReply: true
                 };
                 $('#PrsnlRplBtn').hide();
                 $('#CancelRplBtn').hide();
                 $('#sendBtn').show();
-                document.getElementById('MsgFld').innerHTML = ""; 
+                document.getElementById('MsgFld').innerHTML = "";
                 document.getElementById('MsgFld').style.display = "none";
                 $("#usrTxt").val("");
 
                 $.ajax({
-                    type: "POST",
+                    type: "PUT",
                     data: JSON.stringify(userMessage),
-                    url: base_url + "Messages/",
+                    url: base_url + "chats/" + crntChatId,
                     crossDomain: true,
                     contentType: "application/json",
                     success: function (data) {
@@ -471,11 +549,6 @@
             }
 
         });
-
-
-        function PersonalReply(crntMess, crntUser) {
-
-        }
 
 
         function ShowRegistration() {
@@ -512,15 +585,15 @@
                             $.each(fields, function (i, field) {
                                 document.getElementById("field" + i).value = " ";
                             });
-                            
-                            
+
+
                             ShowChats();
                             document.getElementById("mainform").style.display = "block";
                             document.getElementById("regform").style.display = "none";
 
                             document.getElementById("loginform").style.display = "none";
                         }
-                    });           
+                    });
 
                 }
                 else {
@@ -532,12 +605,12 @@
         function LoginUser() {
             var fire = true;
             for (var i = 0; i < 2; i++) {
-                if (!document.getElementById("login"+i).value) {
+                if (!document.getElementById("login" + i).value) {
                     alert(document.getElementById("login" + i).name + ' is  required');
                     var fire = false;
                 }
-            }   
-            
+            }
+
             if (fire) {
                 var url = base_url + 'users/' + document.getElementById("login0").value;
                 var tempuser;
@@ -556,9 +629,15 @@
                         ShowChats();
                         document.getElementById("mainform").style.display = "block";
                         $("#hp").html("User: " + "<b>" + crntUser.userName + "</b>");
-                    }                    
+                    }
                 });
             }
+        }
+
+        function LeaveChtCreation() {
+            document.getElementById("chatname").value = "";
+            document.getElementById("chatcreationform").style.display = "none";
+            document.getElementById("mainform").style.display = "block";
         }
 
         function LeaveRegistration() {

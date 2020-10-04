@@ -18,8 +18,8 @@
             Password:
             <input id="login1" name="password" placeholder="password" />
             <br /><br />
-            <button onclick="LoginUser();">Login</button>&nbsp;&nbsp;
-            <button onclick="ShowRegistration();">Register</button>
+            <button class="button" onclick="LoginUser();">Login</button>&nbsp;&nbsp;
+            <button class="button" onclick="ShowRegistration();">Register</button>
         </div>
     </fieldset>
     <fieldset id="regform" style="display:none;">
@@ -40,8 +40,8 @@
             Password:
             <input id="field3" name="password" placeholder="retype password" />
             <br /><br />
-            <button onclick="SubmitForm();">Register</button>&nbsp;&nbsp;
-            <button onclick="LeaveRegistration();">Cancel</button>
+            <button class="button" onclick="SubmitForm();">Register</button>&nbsp;&nbsp;
+            <button class="button cancel" onclick="LeaveRegistration();">Cancel</button>
         </div>
     </fieldset>
 
@@ -53,15 +53,15 @@
             <input id="chatname" name="name" placeholder="Chat caption" />
             <br /><br />            
             
-            <button onclick="CreateChat();">Create</button>&nbsp;&nbsp;
-            <button onclick="LeaveChtCreation();">Cancel</button>
+            <button class="button" onclick="CreateChat();">Create</button>&nbsp;&nbsp;
+            <button class="button cancel" onclick="LeaveChtCreation();">Cancel</button>
         </div>
     </fieldset>
 
     <div id="mainform" style="display:none;">
         <div style="overflow:auto;">
             <div class="left">
-                <button onclick="ChatCreation()">Create chat</button>
+                <button class="button" onclick="ChatCreation()">Create chat</button>
                 <select id="ChatSelect" autofocus onchange="ChooseOption(this.value);"></select>
             </div>
 
@@ -83,45 +83,52 @@
                 <button id="chatJoin" title="Join current chat" onclick="ChatJoin();" style="display:none;">Join chat</button>
 
             </div>
-            <div class="bottom">
-                <label style="position:relative;">Chat messages:</label>
-                <hr />
-                <div>
-                    <ul class="demo" id="mine_popup">
-                        <li id="msghead" class="msheader" style="color:white;background-color:Highlight;margin-top:0px;"></li>
-                        <li onclick="MsgDeleteOne(crntMess);">delete for myself</li>
-                        <li onclick="MsgDelete();">delete for everyone</li>
-                        <li onclick="MsgEdit()">edit</li>
-                        <li onclick="HidePopup('mine_popup');">cancel</li>
-                    </ul>
-                </div>
-                <div>
-                    <ul class="demo" id="mine_popupPrvt">
-                        <li id="msgheadPrvt" class="msheader" style="color:white;background-color:Highlight;margin-top:0px;"></li>
-                        <li onclick="PublicReply(crntMess);">reply</li>
-                        <li onclick="PersonalReply(crntMess, crntUser);">reply to sender personaly</li>
-                        <li onclick="StartPrivateChat(crntMess.userId, crntUser);">start a private chat</li>
-                        <li onclick="HidePopup('mine_popupPrvt');">cancel</li>
-                    </ul>
-                </div>
-                <div id="messagefield"></div>
-            </div>
-
-        </div>
-        <div class="left" id="usermsg">
             <div style="float:left;">
-                <p id="hp"></p>
-                <button id="logout" onclick="LogOut();">Log out</button>
+                <div class="bottom">
+                    <label>Chat messages:</label>
+                    <hr />
+                    <div>
+                        <ul class="demo" id="mine_popup">
+                            <li id="msghead" class="msheader" style="color:white;background-color:Highlight;margin-top:0px;"></li>
+                            <li onclick="MsgDeleteOne(crntMess);">delete for myself</li>
+                            <li onclick="MsgDelete();">delete for everyone</li>
+                            <li onclick="MsgEdit()">edit</li>
+                            <li onclick="HidePopup('mine_popup');">cancel</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <ul class="demo" id="mine_popupPrvt">
+                            <li id="msgheadPrvt" class="msheader" style="color:white;background-color:Highlight;margin-top:0px;"></li>
+                            <li onclick="PublicReply(crntMess);">reply</li>
+                            <li onclick="PersonalReply(crntMess, crntUser);">reply to sender personaly</li>
+                            <li onclick="StartPrivateChat(crntMess.userId, crntUser);">start a private chat</li>
+                            <li onclick="HidePopup('mine_popupPrvt');">cancel</li>
+                        </ul>
+                    </div>
+                    <div id="messagefield"></div>
+                </div>
+                <div id="pagination" class="paginationMine">
+                    <a class="activeM" href="#">1</a>
+                    <a href="#">2</a>
+                </div>
+            </div>            
+        </div>
+
+        <div class="left" id="usermsg">
+            <div style="margin-bottom:10px;">
+                <span id="hp"></span>
+                <button class="button" id="logout" onclick="LogOut();">Log out</button>                 
             </div>
+            
             <div style="display:inline-block;">
                 <div id="MsgFld" style="border:1px solid blue;border-radius:50px 20px;display:none;margin:5px; padding:10px;background-color:lightgray;"></div>
                 <textarea id="usrTxt" style="width:300px;height:50px;overflow:auto;"></textarea>
             </div>
             <div>
-                <button id="PrsnlRplBtn" style="display:none;">Reply</button>
-                <button id="CancelRplBtn" style="display:none;">Cancel</button>
-                <button id="sendBtn" style="display:none;margin-left:70px;">Send</button>
-                <button id="updateMsg" style="display:none;margin-left:70px;">Ok</button>
+                <button class="button" id="PrsnlRplBtn" style="display:none;">Reply</button>
+                <button class="button cancel" id="CancelRplBtn" style="display:none;">Cancel</button>
+                <button class="button" id="sendBtn" style="display:none;margin-left:70px;">Send</button>
+                <button class="button" id="updateMsg" style="display:none;margin-left:70px;">Ok</button>
             </div>
         </div>
     </div>
@@ -144,6 +151,7 @@
         var crntMess;
         var scndUser = 0;
         let AdrstMsg;
+        let crntPage = 1;
 
 
         document.getElementById("mine_popup").onmouseleave = function () {
@@ -165,7 +173,7 @@
             $("#sendBtn").css("display", "block");
         }
 
-
+        
         $("#sendBtn").click(function () {
             if ($("#usrTxt").val() == "") { alert("Message can't be blank!"); }
             else {
@@ -269,11 +277,12 @@
                     par.style.color = "red";
                     par.id = object[i].userId;
                     par.addEventListener("click", function () {
-                        document.getElementById("msgheadUP").innerHTML = this.innerHTML.substr(0, 15);
-                        document.getElementById("user_popup").style.display = "block";
+                        if (crntUser.userId != this.id) {
+                            document.getElementById("msgheadUP").innerHTML = this.innerHTML.substr(0, 15);
+                            document.getElementById("user_popup").style.display = "block";
 
-                        scndUserId = this.id;
-
+                            scndUserId = this.id;
+                        }
                     });
                     document.getElementById("chatUsersField").appendChild(par);
                 }

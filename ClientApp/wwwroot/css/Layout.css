@@ -6,6 +6,18 @@ body {
     margin: 0;
 }
 
+.button {
+    background-color:dodgerblue;
+    padding:5px 15px;
+    margin:10px;
+    border-radius:5px;
+    color:white;
+    border:1px solid grey;
+}
+
+.cancel{
+    color:red;
+}
 .specialOne {
     /*background: url("./Images/Сакре-Кьор.jpg") fixed center center no-repeat;
     background-size: cover;
@@ -121,6 +133,35 @@ ul li:hover {
     padding:5px;
     margin-bottom:5px;
 }
+
+.paginationMine a {
+    display:inline-block;
+    color: black;
+    float: left;
+    padding: 8px 16px;
+    text-decoration: none;
+}
+
+    .paginationMine a.disbM {
+        pointer-events: none;
+    }
+
+    .paginationMine a.activeM {
+        background-color: #4CAF50;
+        color: white;
+        border-radius: 5px;
+    }
+
+    .paginationMine a:hover:not(.activeM):not(.disbM) {
+        background-color: #ddd;
+        border-radius: 5px;
+    }
+
+.mine {
+    float: right;
+}
+
+
 
 @media only screen and (max-width:620px) {
     /* For mobile phones: */

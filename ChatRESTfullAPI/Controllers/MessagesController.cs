@@ -95,10 +95,9 @@ namespace ChatRESTfullAPI.Controllers
 
             _context.Messages.Add(message);
             await _context.SaveChangesAsync();
+            
 
-            return Ok(message);
-
-            //return CreatedAtAction("GetMessage", new { id = message.MsgId }, message);
+            return CreatedAtAction("GetMessage", new { id = message.MsgId }, message);
         }
 
         // DELETE: api/Messages/5

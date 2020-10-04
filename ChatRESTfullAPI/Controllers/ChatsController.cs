@@ -29,28 +29,7 @@ namespace ChatRESTfullAPI.Controllers
         {
             List<Chat> chats = null;
             chats = _context.Chats.Include(u => u.ChatUsers).ToList();
-            //try
-            //{
-
-
-            //    chats = _context.Chats.Include(u => u.ChatUsers).ToList();
-
-
-            //    foreach(var chat in chats)
-            //    {
-            //        foreach (ChatUser chatU in chat.ChatUsers)
-            //        {
-            //            chatU.Chat = null;
-            //        }
-            //    }
-
-            //}
-            //catch(Exception e)
-            //{
-
-            //}
-            //return chats;
-
+           
 
             for (int i=0;i<chats.Count;i++)
             {

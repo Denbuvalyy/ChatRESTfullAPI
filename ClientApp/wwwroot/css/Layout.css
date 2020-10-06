@@ -19,9 +19,7 @@ body {
     color:red;
 }
 .specialOne {
-    /*background: url("./Images/Сакре-Кьор.jpg") fixed center center no-repeat;
-    background-size: cover;
-    padding: 350px;*/
+   
     width: 100%;
     height: 50%;
 }
@@ -112,7 +110,7 @@ ul li:hover {
     float:left;
     width:70%;
     padding:10px;
-    margin:5px;
+    margin:2px;
 }
 
 .personalMsgs {

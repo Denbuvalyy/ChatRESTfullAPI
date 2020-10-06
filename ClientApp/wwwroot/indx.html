@@ -221,7 +221,7 @@
                         $('#chatcreationform').hide();
                         $('#mainform').show();
 
-                        ShowChats(chats.length);
+                        ShowChats(data.chatId);
                         $("#usrTxt").focus();
                     }
                 });
@@ -252,7 +252,8 @@
                 success: function (data) {
                     document.getElementById('mine_popupPrvt').style.display = "none";
                     document.getElementById("user_popup").style.display = "none";
-                    ShowChats(chats.length);
+                    
+                    ShowChats(data.chatId);
                     $("#usrTxt").focus();
                 }
             });
@@ -292,7 +293,7 @@
         }
 
 
-        function ShowChats(index = 0) {
+        function ShowChats(index = 1) {
             $("#ChatSelect").empty();
             $.getJSON(base_url + 'chats/', function (object) {
                 var textcolor = "black";
@@ -316,13 +317,8 @@
                     option.appendChild(opttext);
                     document.getElementById("ChatSelect").appendChild(option);
                     document.getElementById("ChatSelect").options[document.getElementById("ChatSelect").length - 1].style.color = textcolor;
-
-                }
-
-                if (index != 0) {
-                    index = document.getElementById("ChatSelect").length - 1;
-                }
-                document.getElementById("ChatSelect").options[index].selected = true;
+                }               
+                document.getElementById("ChatSelect").value = index;
                 document.getElementById("ChatSelect").onchange();
             });
         }
@@ -361,9 +357,7 @@
 
                             var par = document.createElement("span");
                             par.innerText = users[i].userName + ": ";
-
                             par.style.color = "red";
-
 
                             MsgFld.appendChild(par);
                             if (chatMessages[j].userId == crntUser.userId) {
@@ -386,13 +380,11 @@
                                     document.getElementById("mine_popup").style.display = "block";
                                     crntMess = crntMsg;
                                 }
-
                                 else {
                                     document.getElementById("msgheadPrvt").innerHTML = crntMsg.body.substr(0, 15) + "...";
                                     document.getElementById("mine_popupPrvt").style.display = "block";
                                     crntMess = crntMsg;
                                 }
-
                             });
 
                             MsgFld.appendChild(par);
@@ -674,15 +666,12 @@
                                 document.getElementById("field" + i).value = " ";
                             });
 
-
                             ShowChats();
                             document.getElementById("mainform").style.display = "block";
                             document.getElementById("regform").style.display = "none";
-
                             document.getElementById("loginform").style.display = "none";
                         }
                     });
-
                 }
                 else {
                     alert("password doesn't match!");
@@ -709,7 +698,6 @@
                     }
                     else {
                         crntUser = tempuser;
-
                         for (var i = 0; i < 2; i++) {
                             document.getElementById("login" + i).value = " ";
                         }

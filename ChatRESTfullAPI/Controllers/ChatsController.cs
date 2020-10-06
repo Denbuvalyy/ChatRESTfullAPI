@@ -207,73 +207,62 @@ namespace ChatRESTfullAPI.Controllers
             {
                 return BadRequest(ModelState);
             }
-  
             List<ChatUser> tempUsers = chat.ChatUsers.ToList();
-            chat.ChatUsers = null;
+            bool chatExist = false;
+            int chatId = 0;
 
-            _context.Chats.Add(chat);
-            await _context.SaveChangesAsync();
-            //var tempchat= await _context.Chats.Include(m => m.ChatMessages).Include(p => p.ChatUsers)
-            //    .FirstOrDefaultAsync(i => i.ChatId == chat.ChatId);
-            //tempchat.ChatUsers = tempUsers;
-
-            //try
-            //{
-
-
-            for (int i = 0; i < tempUsers.Count; i++)
+            if (chat.Private)
             {
-                ChatUser chatUser = new ChatUser();
-                chatUser.Chat = chat;
-                //chatUser.ChatId = chat.ChatId;
-                var user = _context.Users.Find(tempUsers[i].UserId);
-                chatUser.User = user;
-                // chatUser.UserId = tempUsers[i].UserId;
-                _context.ChatsUsers.Add(chatUser);
+                var tempChats = _context.Chats.Include(c => c.ChatUsers).Where(p => p.Private == true).ToList();
+                
+                for (int i = 0; i < tempChats.Count; i++)
+                {
+                    var chatUsers = tempChats[i].ChatUsers.ToList();
+
+                    for (int j = 0; j < tempUsers.Count; j++)
+                    {
+                        if (chatUsers.Where(n => n.UserId == tempUsers[j].UserId).Any())
+                        {
+                            chatExist = true;
+                        }
+                        else
+                        {
+                            chatExist = false;
+                            break;
+                        }
+                    }
+                    if (chatExist)
+                    {
+                        chatId = tempChats[i].ChatId;
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                chat.ChatUsers = null;
+                _context.Chats.Add(chat);
+                await _context.SaveChangesAsync();
+
+                for (int i = 0; i < tempUsers.Count; i++)
+                {
+                    ChatUser chatUser = new ChatUser();
+                    chatUser.Chat = chat;
+
+                    var user = _context.Users.Find(tempUsers[i].UserId);
+                    chatUser.User = user;
+
+                    _context.ChatsUsers.Add(chatUser);
+                    _context.SaveChanges();
+                }
+
+                _context.Entry(chat).State = EntityState.Modified;
                 _context.SaveChanges();
             }
-
-            _context.Entry(chat).State = EntityState.Modified;
-            _context.SaveChanges();
-            //try
-            //{
-                
-            //}
-            //catch (DbUpdateConcurrencyException)
-            //{
-            //    if (!ChatExists(chat.ChatId))
-            //    {
-            //        return NotFound();
-            //    }
-            //    else
-            //    {
-            //        throw;
-            //    }
-            //}
-
-            //}
-            //catch(Exception ex)
-            //{
-
-            //}
-            //_context.Entry(chat).State = EntityState.Modified;
-
-            //try
-            //{
-            //    await _context.SaveChangesAsync();
-            //}
-            //catch (DbUpdateConcurrencyException)
-            //{
-            //    if (!ChatExists(chat.ChatId))
-            //    {
-            //        return NotFound();
-            //    }
-
-            //    else
-            //    {/        throw;
-            //    }
-            //}
-            //var tempchat = _context.Chats.Find(chat.ChatId);
+            if (chatExist)
+            {
+                chat = _context.Chats.Find(chatId);
+            }
             chat.ChatUsers = null;
 
             return Ok(chat);  

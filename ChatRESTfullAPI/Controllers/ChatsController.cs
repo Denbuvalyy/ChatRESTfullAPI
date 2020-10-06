@@ -64,19 +64,25 @@ namespace ChatRESTfullAPI.Controllers
             {
                 return NotFound();
             }
+            
 
             return Ok(chat);
         }
 
 
-        // GET: api/Chats/5/messages
-        [HttpGet("{id}/messages")]
-        public async Task<IActionResult> GetChatMessages([FromRoute] int id)
+        // GET: api/Chats/5/messages/5/20
+        [HttpGet("{id}/messages/{pageNumber}/{msgsOnPage}")]
+        public async Task<IActionResult> GetChatMessages([FromRoute] int id,int pageNumber,int msgsOnPage)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
+
+
+            
+
+
             var chat = await _context.Chats.Include(m => m.ChatMessages)
                 .FirstOrDefaultAsync(i => i.ChatId == id);
 
@@ -85,7 +91,25 @@ namespace ChatRESTfullAPI.Controllers
                 return NotFound();
             }
 
-            return Ok(chat.ChatMessages);
+            //int msgsCount = chat.ChatMessages.Count();
+            //int pagesNumb;
+            //if (msgsCount % msgsOnPage != 0)
+            //{
+            //    pagesNumb = msgsCount % msgsOnPage;
+            //}
+            //else
+            //{
+            //    pagesNumb = msgsCount / msgsOnPage + 1;
+            //}
+            List<Message> tempMessages = chat.ChatMessages.
+                Skip((pageNumber - 1) * msgsOnPage).Take(msgsOnPage).ToList();
+
+
+            (List<Message>, int) complexChat = (tempMessages, chat.ChatMessages.Count);
+
+            //(List<Message>, int) complexChat = (chat.ChatMessages.ToList(), chat.ChatMessages.Count);
+            return Ok(complexChat);
+            //return Ok(chat.ChatMessages);
         }
 
         // GET: api/Chats/5/users

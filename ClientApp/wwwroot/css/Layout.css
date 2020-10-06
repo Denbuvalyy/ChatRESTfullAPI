@@ -67,7 +67,7 @@ img {
 
 .bottom {
     float:left;
-    width:50vw;
+    width:55vw;
     height:400px;
     padding:10px;
     margin:10px;
@@ -134,25 +134,27 @@ ul li:hover {
     margin-bottom:5px;
 }
 
-.paginationMine a {
+.paginationMine button {
     display:inline-block;
     color: black;
     float: left;
     padding: 8px 16px;
     text-decoration: none;
+    margin:1px;
 }
 
-    .paginationMine a.disbM {
+    .paginationMine button.disbM {
         pointer-events: none;
+        color:grey;
     }
 
-    .paginationMine a.activeM {
+    .paginationMine button.activeM {
         background-color: #4CAF50;
         color: white;
         border-radius: 5px;
     }
 
-    .paginationMine a:hover:not(.activeM):not(.disbM) {
+    .paginationMine button:hover:not(.activeM):not(.disbM) {
         background-color: #ddd;
         border-radius: 5px;
     }

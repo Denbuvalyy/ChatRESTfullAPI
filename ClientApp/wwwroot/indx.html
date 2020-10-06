@@ -108,8 +108,7 @@
                     <div id="messagefield"></div>
                 </div>
                 <div id="pagination" class="paginationMine">
-                    <a class="activeM" href="#">1</a>
-                    <a href="#">2</a>
+                    
                 </div>
             </div>            
         </div>
@@ -152,6 +151,7 @@
         var scndUser = 0;
         let AdrstMsg;
         let crntPage = 1;
+        const msgsOnPage = 20;
 
 
         document.getElementById("mine_popup").onmouseleave = function () {
@@ -167,7 +167,8 @@
 
         function ChooseOption(selValue) {
             crntChatId = selValue;
-
+            document.getElementById("pagination").innerHTML = "";
+            crntPage = 1;
             ShowUsers();
 
             $("#sendBtn").css("display", "block");
@@ -286,9 +287,7 @@
                     });
                     document.getElementById("chatUsersField").appendChild(par);
                 }
-                //var myVar = setInterval(ShowMessages, 5000);
-
-                ShowMessages();
+                ShowMessages(crntPage, msgsOnPage);
             });
         }
 
@@ -329,16 +328,18 @@
         }
 
 
-        function ShowMessages() {
+        function ShowMessages(pageNumber, msgOnPage) {
 
+            document.getElementById("pagination").innerHTML = '';
             document.getElementById("messagefield").innerHTML = '';
-
-            var url = base_url + 'chats/' + crntChatId + '/messages/';
+            let chatMessagesCount;
+            var url = base_url + 'chats/' + crntChatId + '/messages/' + pageNumber + '/' + msgOnPage;
             $.getJSON(url, function (object) {
 
-                chatMessages = object;
+                chatMessages = object.item1;
+                chatMessagesCount = object.item2;
 
-                var j, i;
+                var j, i, pagesCount, tempPage;
                 for (j = 0; j < chatMessages.length; j++) {
                     for (i = 0; i < users.length; i++) {
                         if (chatMessages[j].userId == users[i].userId) {
@@ -368,7 +369,6 @@
                             if (chatMessages[j].userId == crntUser.userId) {
                                 MsgFld.classList.add("personalMsgs");
                             }
-                            //document.getElementById("messagefield").appendChild(par);
                             par = document.createElement("span");
                             par.innerText = "   " + MsgBody + "\n";
                             par.style.fontStyle = "italic";
@@ -401,9 +401,85 @@
                             timeFld.innerText = chatMessages[j].creationTime.substring(11, 16);
                             timeFld.style.cssFloat = "right";
                             MsgFld.appendChild(timeFld);
-                            //document.getElementById("messagefield").appendChild(par);b
                             document.getElementById("messagefield").appendChild(MsgFld);
                         }
+                    }
+                }
+
+                if (chatMessagesCount % msgOnPage != 0) {
+                    pagesCount = parseInt(chatMessagesCount / msgOnPage) + 1;
+                }
+                else {
+                    pagesCount = parseInt(chatMessagesCount / msgOnPage);
+                }
+
+                if (crntPage != 1) {
+                    tempPage = crntPage - 1;
+                }
+                else {
+                    tempPage = crntPage;
+                }
+                for (i = tempPage; i <= pagesCount; i++) {
+
+                    if (i > parseInt(tempPage) + 2) {
+                        break;
+                    }
+                    var pageBtn = document.createElement("button");
+                    pageBtn.innerText = i;
+                    if (i == pageNumber) {
+                        pageBtn.classList.add("activeM");
+                    }
+                    pageBtn.id = "pagebtn" + i;
+                    pageBtn.onclick = function () {
+                        if (pageNumber != this.id.substr(7)) {
+
+                            crntPage = this.id.substr(7);
+                            document.getElementById("pagination").innerHTML = "";
+                            ShowMessages(crntPage, msgOnPage);
+                        }
+                    };
+                    document.getElementById("pagination").appendChild(pageBtn);
+                }
+                if (pagesCount != 0) {
+                    var scrollSymbols = ["|<", "<", ">", ">|"];
+                    for (i = 0; i < scrollSymbols.length; i++) {
+                        var pageSpecBtn = document.createElement("button");
+                        pageSpecBtn.innerText = scrollSymbols[i];
+                        pageSpecBtn.id = "specpagebtn" + scrollSymbols[i];
+                        pageSpecBtn.onclick = function () {
+
+                            switch (this.id.substr(11)) {
+                                case "|<":
+                                    if (pageNumber != 1) {
+                                        crntPage = 1;
+                                    }
+                                    break;
+                                case "<":
+                                    if (pageNumber != 1) {
+                                        crntPage--;
+                                    }
+                                    break;
+                                case ">":
+                                    if (pageNumber != pagesCount) {
+                                        crntPage++;
+                                    }
+                                    break;
+                                case ">|":
+                                    if (pageNumber != pagesCount) {
+                                        crntPage = pagesCount;
+                                    }
+                                    break;
+                            }
+                            document.getElementById("pagination").innerHTML = "";
+                            ShowMessages(crntPage, msgOnPage);
+                        }
+                        if ((i == 0 || i == 1) && crntPage == 1) {
+                            pageSpecBtn.classList.add("disbM");
+                        }
+                        if ((i == scrollSymbols.length - 1 || i == scrollSymbols.length - 2) && crntPage == pagesCount) {
+                            pageSpecBtn.classList.add("disbM");
+                        }                        
+                        document.getElementById("pagination").appendChild(pageSpecBtn);
                     }
                 }
                 $("#usrTxt").focus();
@@ -488,34 +564,37 @@
 
 
         function PublicReply(crntMess) {
+            if (!crntMess.isReply) {
+                $("#usrTxt").val("");
+                AdrstMsg = document.getElementById(crntMess.msgId).innerText;
+                AdrstMsg = AdrstMsg.substr(0, AdrstMsg.length - 5);
+                if (AdrstMsg.length >= 20) {
+                    AdrstMsg = AdrstMsg.substr(0, 20) + "...";
+                }
+                else {
+                    var suffix = 20 - AdrstMsg.length;
+                    AdrstMsg = AdrstMsg + "..." + " ".repeat(suffix);
 
-            document.getElementById("mine_popupPrvt").style.display = "none";
-            $("#usrTxt").val("");
-            //document.getElementById('MsgFld').innerHTML =
-            AdrstMsg = document.getElementById(crntMess.msgId).innerText;//.substr(0, 20) + "...";
-            AdrstMsg = AdrstMsg.substr(0, AdrstMsg.length - 5);
-            if (AdrstMsg.length >= 20) {
-                AdrstMsg = AdrstMsg.substr(0, 20) + "...";
+                }
+                document.getElementById('MsgFld').innerHTML = AdrstMsg;
+                document.getElementById('MsgFld').style.display = "block";
+                $("#usrTxt").focus();
+                $('#PrsnlRplBtn').show();
+                $('#CancelRplBtn').show();
+                $('#sendBtn').hide();
             }
-            else {
-                var suffix = 20 - AdrstMsg.length;
-                AdrstMsg = AdrstMsg + "..." + " ".repeat(suffix);
-
-            }
-            document.getElementById('MsgFld').innerHTML = AdrstMsg;
-            document.getElementById('MsgFld').style.display = "block";
-            $("#usrTxt").focus();
-            $('#PrsnlRplBtn').show();
-            $('#CancelRplBtn').show();
-            $('#sendBtn').hide();
+            HidePopup("mine_popupPrvt");
         }
 
 
         function PersonalReply(crntMsg, crntUser) {
 
-            PublicReply(crntMsg);
-            StartPrivateChat(crntMsg.userId, crntUser);
-            $('#sendBtn').hide();
+            if (!crntMsg.isReply) {
+                PublicReply(crntMsg);
+                StartPrivateChat(crntMsg.userId, crntUser);
+                $('#sendBtn').hide();
+            }
+            HidePopup("mine_popupPrvt");
         }
 
         $('#CancelRplBtn').click(function () {
@@ -656,6 +735,7 @@
 
         function LogOut() {
             crntUser = null;
+            $("#usrTxt").val("");
             document.getElementById("mainform").style.display = "none";
             document.getElementById("loginform").style.display = "block";
         }

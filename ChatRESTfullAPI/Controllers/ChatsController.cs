@@ -78,11 +78,7 @@ namespace ChatRESTfullAPI.Controllers
             {
                 return BadRequest(ModelState);
             }
-
-
-            
-
-
+                       
             var chat = await _context.Chats.Include(m => m.ChatMessages)
                 .FirstOrDefaultAsync(i => i.ChatId == id);
 
@@ -91,18 +87,42 @@ namespace ChatRESTfullAPI.Controllers
                 return NotFound();
             }
 
-            //int msgsCount = chat.ChatMessages.Count();
-            //int pagesNumb;
-            //if (msgsCount % msgsOnPage != 0)
-            //{
-            //    pagesNumb = msgsCount % msgsOnPage;
-            //}
-            //else
-            //{
-            //    pagesNumb = msgsCount / msgsOnPage + 1;
-            //}
-            List<Message> tempMessages = chat.ChatMessages.
-                Skip((pageNumber - 1) * msgsOnPage).Take(msgsOnPage).ToList();
+            int msgsCount = chat.ChatMessages.Count();
+            int pagesNumb, rest, count;
+
+            if (msgsCount % msgsOnPage == 0)
+            {
+                pagesNumb = msgsCount / msgsOnPage;
+                rest = 0;
+                count = msgsOnPage;
+            }
+            else
+            {
+                pagesNumb = msgsCount / msgsOnPage + 1;
+                rest=msgsOnPage- msgsCount % msgsOnPage;
+                count = msgsCount % msgsOnPage;
+            }
+            List<Message> tempMessages = null;
+
+            if (pageNumber == 1)
+            {
+                
+                tempMessages = chat.ChatMessages.Take(count).ToList();
+            }
+            else if (pageNumber == 0)
+            {
+                tempMessages = chat.ChatMessages.TakeLast(msgsOnPage).ToList();
+            }
+            else
+            {
+                tempMessages = chat.ChatMessages.Skip((pagesNumb - 1) * msgsOnPage - rest).Take(msgsOnPage).ToList();
+            }
+
+            //tempMessages = chat.ChatMessages.
+            //    Skip((pageNumber - 1) * msgsOnPage).TakeLast(msgsOnPage).ToList();
+
+            //List<Message> tempMessages = chat.ChatMessages.
+            //    Skip((pageNumber - 1) * msgsOnPage).Take(msgsOnPage).ToList();
 
 
             (List<Message>, int) complexChat = (tempMessages, chat.ChatMessages.Count);
@@ -209,8 +229,7 @@ namespace ChatRESTfullAPI.Controllers
             }
             List<ChatUser> tempUsers = chat.ChatUsers.ToList();
             bool chatExist = false;
-            int chatId = 0;
-
+           
             if (chat.Private)
             {
                 var tempChats = _context.Chats.Include(c => c.ChatUsers).Where(p => p.Private == true).ToList();
@@ -232,14 +251,13 @@ namespace ChatRESTfullAPI.Controllers
                         }
                     }
                     if (chatExist)
-                    {
-                        chatId = tempChats[i].ChatId;
-                        break;
+                    {                      
+                        chat = _context.Chats.Find(tempChats[i].ChatId);
+                        chat.ChatUsers = null;
+                        return Ok(chat);                     
                     }
                 }
-            }
-            else
-            {
+            }           
                 chat.ChatUsers = null;
                 _context.Chats.Add(chat);
                 await _context.SaveChangesAsync();
@@ -258,11 +276,7 @@ namespace ChatRESTfullAPI.Controllers
 
                 _context.Entry(chat).State = EntityState.Modified;
                 _context.SaveChanges();
-            }
-            if (chatExist)
-            {
-                chat = _context.Chats.Find(chatId);
-            }
+                     
             chat.ChatUsers = null;
 
             return Ok(chat);  

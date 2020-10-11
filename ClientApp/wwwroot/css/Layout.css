@@ -35,21 +35,28 @@ img {
 
 .left {
     float: left;
-    width: 45%;
+    width: 100%;
     text-align: left;
-    padding: 15px;
-   
+    padding: 5px;
+    overflow: auto;
 }
 
+.middle{
+    padding:5px 35px;
+}
 
 .login{
     padding:15px;
 }
 .main {
     float: left;
-    width: 20%;
-    padding: 0 25px;
+    width: 8%;
+    padding: 10px 5px;
     text-align: justify;
+    border: 1px dashed grey;
+    height: 350px;    
+    overflow: auto;
+    margin: 5px;
 }
 
 .right {
@@ -65,10 +72,10 @@ img {
 
 .bottom {
     float:left;
-    width:55vw;
-    height:400px;
+    width:100%;
+    height:500px;
     padding:10px;
-    margin:10px;
+    margin:5px;
     border:1px solid grey;
     overflow:auto;
 }  
@@ -132,13 +139,25 @@ ul li:hover {
     margin-bottom:5px;
 }
 
+.showMsg {
+    color:black;
+    padding:10px 20px;
+    margin:5px 400px;
+    
+}
+
+.disbM {
+    pointer-events: none;
+    color: grey;
+}
+
 .paginationMine button {
-    display:inline-block;
+    display: inline-block;
     color: black;
     float: left;
     padding: 8px 16px;
     text-decoration: none;
-    margin:1px;
+    margin: 1px;
 }
 
     .paginationMine button.disbM {
@@ -161,14 +180,21 @@ ul li:hover {
     float: right;
 }
 
-
+.wrap{
+    width:88%;
+    float:left;
+}
 
 @media only screen and (max-width:620px) {
     /* For mobile phones: */
-    .left, .main, .right {
+    .left, .main, .right, .bottom, .wrap {
         width: 100%;
     }
     #sendBtn {
         margin-left:100px;
+    }
+    .showMsg{
+        margin:5px 50px;
+        
     }
 }

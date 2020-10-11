@@ -16,7 +16,7 @@
             <input id="login0" name="email" placeholder="email" />
             <br /><br />
             Password:
-            <input id="login1" name="password" placeholder="password" />
+            <input id="login1" type="password" name="password" placeholder="password" />
             <br /><br />
             <button class="button" onclick="LoginUser();">Login</button>&nbsp;&nbsp;
             <button class="button" onclick="ShowRegistration();">Register</button>
@@ -34,11 +34,11 @@
             <br /><br />
 
             Password:
-            <input id="field2" name="password" placeholder="password" />
+            <input id="field2" type="password" name="password" placeholder="password" />
             <br /><br />
 
             Password:
-            <input id="field3" name="password" placeholder="retype password" />
+            <input id="field3" type="password" name="password" placeholder="retype password" />
             <br /><br />
             <button class="button" onclick="SubmitForm();">Register</button>&nbsp;&nbsp;
             <button class="button cancel" onclick="LeaveRegistration();">Cancel</button>
@@ -58,78 +58,75 @@
         </div>
     </fieldset>
 
-    <div id="mainform" style="display:none;">
-        <div style="overflow:auto;">
-            <div class="left">
-                <button class="button" onclick="ChatCreation()">Create chat</button>
-                <select id="ChatSelect" autofocus onchange="ChooseOption(this.value);"></select>
-            </div>
+    <div id="mainform" style="display:none;width:100vw;float:left;">
 
-
+        <div class="left">
+            <button class="button" onclick="ChatCreation()">Create chat</button>
+            <span style="padding:5px;">Chats:</span>
+            <select id="ChatSelect" autofocus onchange="ChooseOption(this.value);"></select>
+            <span id="hp" style="padding:10px;"></span>
+            <button class="button" id="logout" onclick="LogOut();">Log out</button>
         </div>
 
-        <div style="overflow:auto;">
-            <div class="main">
-                <label style="position:relative">Chat users:</label>
+        <div class="main">
+            <label style="position:relative">Chat users:</label>
+            <hr />
+            <div>
+                <ul class="demo" id="user_popup">
+                    <li id="msgheadUP" class="msheader" style="color:white;background-color:Highlight;margin-top:0px;"></li>
+                    <li onclick="StartPrivateChat(scndUserId, crntUser);">start a private chat</li>
+                    <li onclick="HidePopup('user_popup');">cancel</li>
+                </ul>
+            </div>
+            <div id="chatUsersField"></div>
+        </div>       
+            
+
+                
+        <div class="wrap">
+            
+            <div class="bottom" id="msgfld">
+                <button id="showmsgs" class="showMsg" onclick="ShowNextMsgs();"></button>
                 <div>
-                    <ul class="demo" id="user_popup">
-                        <li id="msgheadUP" class="msheader" style="color:white;background-color:Highlight;margin-top:0px;"></li>
-                        <li onclick="StartPrivateChat(scndUserId, crntUser);">start a private chat</li>
-                        <li onclick="HidePopup('user_popup');">cancel</li>
+                    <ul class="demo" id="mine_popup">
+                        <li id="msghead" class="msheader" style="color:white;background-color:Highlight;margin-top:0px;"></li>
+                        <li onclick="MsgDeleteOne(crntMess);">delete for myself</li>
+                        <li onclick="MsgDelete();">delete for everyone</li>
+                        <li onclick="MsgEdit()">edit</li>
+                        <li onclick="HidePopup('mine_popup');">cancel</li>
                     </ul>
                 </div>
-                <div id="chatUsersField"></div>
+                <div>
+                    <ul class="demo" id="mine_popupPrvt">
+                        <li id="msgheadPrvt" class="msheader" style="color:white;background-color:Highlight;margin-top:0px;"></li>
+                        <li onclick="PublicReply(crntMess);">reply</li>
+                        <li onclick="PersonalReply(crntMess, crntUser);">reply to sender personaly</li>
+                        <li onclick="StartPrivateChat(crntMess.userId, crntUser);">start a private chat</li>
+                        <li onclick="HidePopup('mine_popupPrvt');">cancel</li>
+                    </ul>
+                </div>  
+                <div id="messagefield"></div>
+            </div>
+            <div id="pagination" class="paginationMine" style="width:80%;padding:10px;">
 
-                <button id="chatJoin" title="Join current chat" onclick="ChatJoin();" style="display:none;">Join chat</button>
+            </div>
 
+        </div>
+        
+        <div class="left middle" id="usermsg">
+
+            <div style="display:inline-block;width:70%;float:left;">
+                <div id="MsgFld" style="border:1px solid blue;border-radius:50px 20px;display:none;margin:5px; padding:10px;background-color:lightgray;"></div>
+                <textarea id="usrTxt" style="width:100%;height:50px;overflow:auto;"></textarea>
             </div>
             <div style="float:left;">
-                <div class="bottom">
-                    <label>Chat messages:</label>
-                    <hr />
-                    <div>
-                        <ul class="demo" id="mine_popup">
-                            <li id="msghead" class="msheader" style="color:white;background-color:Highlight;margin-top:0px;"></li>
-                            <li onclick="MsgDeleteOne(crntMess);">delete for myself</li>
-                            <li onclick="MsgDelete();">delete for everyone</li>
-                            <li onclick="MsgEdit()">edit</li>
-                            <li onclick="HidePopup('mine_popup');">cancel</li>
-                        </ul>
-                    </div>
-                    <div>
-                        <ul class="demo" id="mine_popupPrvt">
-                            <li id="msgheadPrvt" class="msheader" style="color:white;background-color:Highlight;margin-top:0px;"></li>
-                            <li onclick="PublicReply(crntMess);">reply</li>
-                            <li onclick="PersonalReply(crntMess, crntUser);">reply to sender personaly</li>
-                            <li onclick="StartPrivateChat(crntMess.userId, crntUser);">start a private chat</li>
-                            <li onclick="HidePopup('mine_popupPrvt');">cancel</li>
-                        </ul>
-                    </div>
-                    <div id="messagefield"></div>
-                </div>
-                <div id="pagination" class="paginationMine">
-                    
-                </div>
-            </div>            
-        </div>
-
-        <div class="left" id="usermsg">
-            <div style="margin-bottom:10px;">
-                <span id="hp"></span>
-                <button class="button" id="logout" onclick="LogOut();">Log out</button>                 
-            </div>
-            
-            <div style="display:inline-block;">
-                <div id="MsgFld" style="border:1px solid blue;border-radius:50px 20px;display:none;margin:5px; padding:10px;background-color:lightgray;"></div>
-                <textarea id="usrTxt" style="width:300px;height:50px;overflow:auto;"></textarea>
-            </div>
-            <div>
                 <button class="button" id="PrsnlRplBtn" style="display:none;">Reply</button>
                 <button class="button cancel" id="CancelRplBtn" style="display:none;">Cancel</button>
-                <button class="button" id="sendBtn" style="display:none;margin-left:70px;">Send</button>
-                <button class="button" id="updateMsg" style="display:none;margin-left:70px;">Ok</button>
+                <button class="button" id="sendBtn" style="display:none;margin-left:30px;">Send</button>
+                <button class="button" id="updateMsg" style="display:none;margin-left:30px;">Ok</button>
             </div>
         </div>
+
     </div>
 
 
@@ -145,12 +142,13 @@
         var crntChatId;
         var crntUser;
         var chatMessages;
+        let allChatMessages;
         var users;
         var scndUserId;
         var crntMess;
         var scndUser = 0;
         let AdrstMsg;
-        let crntPage = 1;
+        let crntPage = 0;
         const msgsOnPage = 20;
 
 
@@ -168,8 +166,10 @@
         function ChooseOption(selValue) {
             crntChatId = selValue;
             document.getElementById("pagination").innerHTML = "";
-            crntPage = 1;
+            allChatMessages = [];
+           
             ShowUsers();
+            //document.getElementById("messagefield").innerHTML = '';
 
             $("#sendBtn").css("display", "block");
         }
@@ -188,6 +188,7 @@
                     contentType: "application/json",
                     success: function (data) {
                         $("#usrTxt").val("");
+                        
                         ShowUsers();
                     }
                 });
@@ -288,6 +289,8 @@
                     });
                     document.getElementById("chatUsersField").appendChild(par);
                 }
+                crntPage = 0;
+                document.getElementById("messagefield").innerHTML = '';
                 ShowMessages(crntPage, msgsOnPage);
             });
         }
@@ -327,15 +330,44 @@
         function ShowMessages(pageNumber, msgOnPage) {
 
             document.getElementById("pagination").innerHTML = '';
-            document.getElementById("messagefield").innerHTML = '';
+            //document.getElementById("messagefield").innerHTML = '';
             let chatMessagesCount;
+            //let todayMsgExist = false;
             var url = base_url + 'chats/' + crntChatId + '/messages/' + pageNumber + '/' + msgOnPage;
             $.getJSON(url, function (object) {
-
+                var tempMsgsField = document.createElement("div");
+                allChatMessages = allChatMessages.concat(object.item1);
                 chatMessages = object.item1;
+                chatMessages.reverse();
                 chatMessagesCount = object.item2;
 
                 var j, i, pagesCount, tempPage;
+                
+               
+
+                if (chatMessagesCount % msgOnPage != 0) {
+                    pagesCount = parseInt(chatMessagesCount / msgOnPage) + 1;
+                }
+                else {
+                    pagesCount = parseInt(chatMessagesCount / msgOnPage);
+                }
+                if (pageNumber == 0) {
+                    crntPage = pagesCount;
+                }
+                
+                
+                var showBtn = document.getElementById("showmsgs");
+                showBtn.innerText = "Show next " + msgOnPage + " messages";
+                if (pagesCount == 1 || crntPage == 1 || pagesCount==0) {
+                    showBtn.classList.add("disbM");
+                }
+                else {
+                    showBtn.classList.remove("disbM");
+                }
+
+                //document.getElementById("msgfld").appendChild(GetMessagesBtn);
+
+
                 for (j = 0; j < chatMessages.length; j++) {
                     for (i = 0; i < users.length; i++) {
                         if (chatMessages[j].userId == users[i].userId) {
@@ -369,9 +401,9 @@
                             MsgFld.id = chatMessages[j].msgId;
                             MsgFld.addEventListener("click", function () {
                                 var crntMsg;
-                                for (j = 0; j < chatMessages.length; j++) {
-                                    if (chatMessages[j].msgId == this.id) {
-                                        crntMsg = chatMessages[j];
+                                for (j = 0; j < allChatMessages.length; j++) {
+                                    if (allChatMessages[j].msgId == this.id) {
+                                        crntMsg = allChatMessages[j];
                                         break;
                                     }
                                 }
@@ -390,90 +422,113 @@
                             MsgFld.appendChild(par);
                             var timeFld = document.createElement("span");
                             timeFld.style.fontSize = "10px";
-                            timeFld.innerText = chatMessages[j].creationTime.substring(11, 16);
+                            var dateMsg = chatMessages[j].creationTime.substring(2, 10);
+                            timeFld.innerText = dateMsg.substring(6, 8) + dateMsg.substring(2, 6) + dateMsg.substring(0,2)+" " + chatMessages[j].creationTime.substring(11, 16);
+                            //timeFld.innerText = chatMessages[j].creationTime.substring(2, 10) + " " + chatMessages[j].creationTime.substring(11, 16);
                             timeFld.style.cssFloat = "right";
                             MsgFld.appendChild(timeFld);
-                            document.getElementById("messagefield").appendChild(MsgFld);
+
+                            //var creationTime = document.createElement("div");
+                            //var dateMsg = chatMessages[j].creationTime.substring(0, 10);
+                            //var timeNow = new Date();
+                            //var month = parseInt(timeNow.getMonth()) + 1;
+                            //var dateNow = timeNow.getFullYear() + "-" + month + "-" + timeNow.getDate();
+                            ////if (dateMsg == dateNow&&todayMsgExist==false) {
+                            ////    creationTime.innerText = "Today";
+                            ////}
+                            //    creationTime.innerText = dateMsg + " Smile " + dateNow;
+
+                            document.getElementById("messagefield").insertBefore(MsgFld, document.getElementById("messagefield").childNodes[0]);
+                            //document.getElementById("messagefield").insertBefore(creationTime, document.getElementById("messagefield").childNodes[0]);
+                            //tempMsgsField.appendChild(MsgFld);
+                            //document.getElementById("messagefield").appendChild(MsgFld);
                         }
                     }
                 }
+                //var messagesField = document.getElementById("messagefield");
+                //messagesField.insertBefore(tempMsgsField, messagesField.childNodes[0]);
 
-                if (chatMessagesCount % msgOnPage != 0) {
-                    pagesCount = parseInt(chatMessagesCount / msgOnPage) + 1;
-                }
-                else {
-                    pagesCount = parseInt(chatMessagesCount / msgOnPage);
-                }
+                var scroll = document.getElementById('msgfld');
+                scroll.scrollTop = scroll.scrollHeight;
+                //scroll.animate({ scrollTop: scroll.scrollHeight });                
 
-                if (crntPage != 1) {
-                    tempPage = crntPage - 1;
-                }
-                else {
-                    tempPage = crntPage;
-                }
-                for (i = tempPage; i <= pagesCount; i++) {
+                
+                //if (chatMessagesCount % msgOnPage != 0) {
+                //    pagesCount = parseInt(chatMessagesCount / msgOnPage) + 1;
+                //}
+                //else {
+                //    pagesCount = parseInt(chatMessagesCount / msgOnPage);
+                //}
 
-                    if (i > parseInt(tempPage) + 2) {
-                        break;
-                    }
-                    var pageBtn = document.createElement("button");
-                    pageBtn.innerText = i;
-                    if (i == pageNumber) {
-                        pageBtn.classList.add("activeM");
-                    }
-                    pageBtn.id = "pagebtn" + i;
-                    pageBtn.onclick = function () {
-                        if (pageNumber != this.id.substr(7)) {
+                //if (crntPage != 1) {
+                //    tempPage = crntPage - 1;
+                //}
+                //else {
+                //    tempPage = crntPage;
+                //}
+                //for (i = tempPage; i <= pagesCount; i++) {
 
-                            crntPage = this.id.substr(7);
-                            document.getElementById("pagination").innerHTML = "";
-                            ShowMessages(crntPage, msgOnPage);
-                        }
-                    };
-                    document.getElementById("pagination").appendChild(pageBtn);
-                }
-                if (pagesCount != 0) {
-                    var scrollSymbols = ["|<", "<", ">", ">|"];
-                    for (i = 0; i < scrollSymbols.length; i++) {
-                        var pageSpecBtn = document.createElement("button");
-                        pageSpecBtn.innerText = scrollSymbols[i];
-                        pageSpecBtn.id = "specpagebtn" + scrollSymbols[i];
-                        pageSpecBtn.onclick = function () {
+                //    if (i > parseInt(tempPage) + 2) {
+                //        break;
+                //    }
+                //    var pageBtn = document.createElement("button");
+                //    pageBtn.innerText = i;
+                //    if (i == pageNumber) {
+                //        pageBtn.classList.add("activeM");
+                //    }
+                //    pageBtn.id = "pagebtn" + i;
+                //    pageBtn.onclick = function () {
+                //        if (pageNumber != this.id.substr(7)) {
 
-                            switch (this.id.substr(11)) {
-                                case "|<":
-                                    if (pageNumber != 1) {
-                                        crntPage = 1;
-                                    }
-                                    break;
-                                case "<":
-                                    if (pageNumber != 1) {
-                                        crntPage--;
-                                    }
-                                    break;
-                                case ">":
-                                    if (pageNumber != pagesCount) {
-                                        crntPage++;
-                                    }
-                                    break;
-                                case ">|":
-                                    if (pageNumber != pagesCount) {
-                                        crntPage = pagesCount;
-                                    }
-                                    break;
-                            }
-                            document.getElementById("pagination").innerHTML = "";
-                            ShowMessages(crntPage, msgOnPage);
-                        }
-                        if ((i == 0 || i == 1) && crntPage == 1) {
-                            pageSpecBtn.classList.add("disbM");
-                        }
-                        if ((i == scrollSymbols.length - 1 || i == scrollSymbols.length - 2) && crntPage == pagesCount) {
-                            pageSpecBtn.classList.add("disbM");
-                        }                        
-                        document.getElementById("pagination").appendChild(pageSpecBtn);
-                    }
-                }
+                //            crntPage = this.id.substr(7);
+                //            document.getElementById("pagination").innerHTML = "";
+                //            ShowMessages(crntPage, msgOnPage);
+                //        }
+                //    };
+                //    document.getElementById("pagination").appendChild(pageBtn);
+                //}
+                //if (pagesCount != 0) {
+                //    var scrollSymbols = ["|<", "<", ">", ">|"];
+                //    for (i = 0; i < scrollSymbols.length; i++) {
+                //        var pageSpecBtn = document.createElement("button");
+                //        pageSpecBtn.innerText = scrollSymbols[i];
+                //        pageSpecBtn.id = "specpagebtn" + scrollSymbols[i];
+                //        pageSpecBtn.onclick = function () {
+
+                //            switch (this.id.substr(11)) {
+                //                case "|<":
+                //                    if (pageNumber != 1) {
+                //                        crntPage = 1;
+                //                    }
+                //                    break;
+                //                case "<":
+                //                    if (pageNumber != 1) {
+                //                        crntPage--;
+                //                    }
+                //                    break;
+                //                case ">":
+                //                    if (pageNumber != pagesCount) {
+                //                        crntPage++;
+                //                    }
+                //                    break;
+                //                case ">|":
+                //                    if (pageNumber != pagesCount) {
+                //                        crntPage = pagesCount;
+                //                    }
+                //                    break;
+                //            }
+                //            document.getElementById("pagination").innerHTML = "";
+                //            ShowMessages(crntPage, msgOnPage);
+                //        }
+                //        if ((i == 0 || i == 1) && crntPage == 1) {
+                //            pageSpecBtn.classList.add("disbM");
+                //        }
+                //        if ((i == scrollSymbols.length - 1 || i == scrollSymbols.length - 2) && crntPage == pagesCount) {
+                //            pageSpecBtn.classList.add("disbM");
+                //        }                        
+                //        document.getElementById("pagination").appendChild(pageSpecBtn);
+                //    }
+                //}
                 $("#usrTxt").focus();
 
             });
@@ -504,6 +559,7 @@
                 document.getElementById("usrTxt").value = crntMess.body;
             }
             $("#sendBtn").css("display", "none");
+            $("#usrTxt").focus();
             document.getElementById("updateMsg").style.display = "block";
         }
 
@@ -559,7 +615,7 @@
             if (!crntMess.isReply) {
                 $("#usrTxt").val("");
                 AdrstMsg = document.getElementById(crntMess.msgId).innerText;
-                AdrstMsg = AdrstMsg.substr(0, AdrstMsg.length - 5);
+                AdrstMsg = AdrstMsg.substr(0, AdrstMsg.length - 14);
                 if (AdrstMsg.length >= 20) {
                     AdrstMsg = AdrstMsg.substr(0, 20) + "...";
                 }
@@ -727,6 +783,21 @@
             document.getElementById("mainform").style.display = "none";
             document.getElementById("loginform").style.display = "block";
         }
+
+        function ShowNextMsgs() {
+
+            crntPage--;
+            ShowMessages(crntPage, msgsOnPage);
+            //var msgsField = document.getElementById("messagefield");
+            //var newMsgs = document.createElement("div");
+            //newMsgs.innerText = "New messages come here";
+            //newMsgs.addEventListener("click", function () {
+            //    alert("New messages... clicked");
+            //});
+            //msgsField.insertBefore(newMsgs, msgsField.childNodes[0]);
+
+        }
+
     </script>
 </body>
 </html>

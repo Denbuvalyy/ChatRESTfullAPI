@@ -8,6 +8,7 @@
     <script src="lib/query/jquery.min.js"></script>
 </head>
 <body>
+    <!-- user login form-->
     <fieldset id="loginform">
 
         <legend>Login to chats</legend>
@@ -22,6 +23,8 @@
             <button class="button" onclick="ShowRegistration();">Register</button>
         </div>
     </fieldset>
+
+    <!--user registration form-->
     <fieldset id="regform" style="display:none;">
         <legend>Registration to chats</legend>
         <div class="ss-item-required" style="margin:10px;padding:10px;width:80vw;height:500px;overflow:auto;">
@@ -45,6 +48,7 @@
         </div>
     </fieldset>
 
+    <!--chat creation form-->
     <fieldset id="chatcreationform" style="display:none;">
         <legend>New Chat</legend>
         <div style="margin:10px;padding:10px;width:80vw;height:500px;overflow:auto;">
@@ -58,8 +62,9 @@
         </div>
     </fieldset>
 
+    <!--main form-->
     <div id="mainform" style="display:none;width:100vw;float:left;">
-
+        
         <div class="left">
             <button class="button" onclick="ChatCreation()">Create chat</button>
             <span style="padding:5px;">Chats:</span>
@@ -68,6 +73,8 @@
             <button class="button" id="logout" onclick="LogOut();">Log out</button>
         </div>
 
+
+        <!--field to show chat users--->
         <div class="main">
             <label style="position:relative">Chat users:</label>
             <hr />
@@ -84,7 +91,7 @@
 
                 
         <div class="wrap">
-            
+            <!--chat messages field-->
             <div class="bottom" id="msgfld">
                 <button id="showmsgs" class="showMsg" onclick="ShowNextMsgs();"></button>
                 <div>
@@ -107,6 +114,7 @@
                 </div>  
                 <div id="messagefield"></div>
             </div>
+            <!--pagination field-->
             <div id="pagination" class="paginationMine" style="width:80%;padding:10px;">
 
             </div>
@@ -129,27 +137,20 @@
 
     </div>
 
-
-    <pre id="preOutput"></pre>
-
-
-
-
-
     <script>
         const base_url = "https://localhost:44367/api/";
-        var chats;
-        var crntChatId;
-        var crntUser;
-        var chatMessages;
-        let allChatMessages;
-        var users;
-        var scndUserId;
-        var crntMess;
-        var scndUser = 0;
-        let AdrstMsg;
-        let crntPage = 0;
-        const msgsOnPage = 20;
+        var chats;// keeps all chats
+        var crntChatId;//current chat Id
+        var crntUser;//current user
+        var chatMessages;//messages of the current chat
+        let allChatMessages;//all messages of the current chat
+        var users;//all users for the current chat
+        var scndUserId;//second user Id for reply message
+        var crntMess;//current message
+        var scndUser = 0;//second user for reply message
+        let AdrstMsg;//message for reply to 
+        let crntPage = 0;//current page for messages to show
+        const msgsOnPage = 20;//number of messages on a page to show
 
 
         document.getElementById("mine_popup").onmouseleave = function () {
@@ -162,24 +163,30 @@
             document.getElementById("user_popup").style.display = "none";
         };
 
-
+        /**
+         * 
+         * @param selValue=chatId of selected chat
+         * initialisation of start values
+         */
         function ChooseOption(selValue) {
             crntChatId = selValue;
             document.getElementById("pagination").innerHTML = "";
-            allChatMessages = [];
-           
+            allChatMessages = [];           
             ShowUsers();
-            //document.getElementById("messagefield").innerHTML = '';
-
             $("#sendBtn").css("display", "block");
         }
 
         
+        /*after button "send" clicked checks if user message isn't blank, 
+         * then adds the message to selected chat
+         */
         $("#sendBtn").click(function () {
             if ($("#usrTxt").val() == "") { alert("Message can't be blank!"); }
             else {
-
-                var userMessage = { body: $("#usrTxt").val(), creationTime: new Date(), chatId: crntChatId, userId: crntUser.userId };
+                var userMessage = {
+                    body: $("#usrTxt").val(), creationTime: new Date(),
+                    chatId: crntChatId, userId: crntUser.userId
+                };
                 $.ajax({
                     type: "PUT",
                     data: JSON.stringify(userMessage),
@@ -194,20 +201,19 @@
                 });
             }
         });
-
-
+        
+        /**shows new chat creation form  */       
         function ChatCreation() {
             $('#mainform').hide();
             $('#chatcreationform').show();
             $('#chatname').focus();
         }
 
-
+        /**creates new chat */        
         function CreateChat() {
             if ($('#chatname').val() == "") { alert("Chat caption can't be blank!"); }
             else {
                 var chatUsers = [{ "userId": crntUser.userId, "user": crntUser }];
-
                 var chat = {
                     chatname: $('#chatname').val(), chatmessages: null,
                     chatusers: chatUsers, 
@@ -229,6 +235,11 @@
             }
         }
 
+        /**
+         * creates private chat between two users
+         * @param scndUsrId
+         * @param crntUser
+         */
         function StartPrivateChat(scndUsrId, crntUser) {
 
             for (var i = 0; i < users.length; i++) {
@@ -252,19 +263,19 @@
                 contentType: "application/json",
                 success: function (data) {
                     document.getElementById('mine_popupPrvt').style.display = "none";
-                    document.getElementById("user_popup").style.display = "none";
-                    
+                    document.getElementById("user_popup").style.display = "none";                    
                     ShowChats(data.chatId);
                     $("#usrTxt").focus();
                 }
             });
         }
 
-
+        /**shows all users for selected chat */
         function ShowUsers() {
-            document.getElementById("chatUsersField").innerHTML = '';
 
+            document.getElementById("chatUsersField").innerHTML = '';
             var url = base_url + 'chats/' + crntChatId + '/users';
+
             $.get(url, function (object) {
                 users = object;
 
@@ -295,7 +306,11 @@
             });
         }
 
-
+        /**
+         * shows all available chats for current users. Private chats shown in blue color, 
+         * public chats in black color
+         * @param index:chat option index to be selected
+         */
         function ShowChats(index = 1) {
             $("#ChatSelect").empty();
             $.getJSON(base_url + 'chats/', function (object) {
@@ -303,7 +318,6 @@
                 chats = object;
                 for (i = 0; i < object.length; i++) {
                     if (object[i].private) {
-                        //if (object[i].chatUsers[0].userId != crntUser.userId && object[i].chatUsers[1].userId != scndUserId) {
                         if (object[i].chatUsers[0].userId != crntUser.userId && object[i].chatUsers[1].userId != crntUser.userId) {
                             continue;
                         }
@@ -327,23 +341,23 @@
         }
 
 
+        /**
+         * shows messages of current user for selected chat
+         * @param pageNumber: number of a page to show messages from
+         * @param msgOnPage: number of messages on a page
+         */
         function ShowMessages(pageNumber, msgOnPage) {
 
-            document.getElementById("pagination").innerHTML = '';
-            //document.getElementById("messagefield").innerHTML = '';
+            //document.getElementById("pagination").innerHTML = '';
             let chatMessagesCount;
-            //let todayMsgExist = false;
             var url = base_url + 'chats/' + crntChatId + '/messages/' + pageNumber + '/' + msgOnPage;
             $.getJSON(url, function (object) {
-                var tempMsgsField = document.createElement("div");
+                //var tempMsgsField = document.createElement("div");
                 allChatMessages = allChatMessages.concat(object.item1);
                 chatMessages = object.item1;
                 chatMessages.reverse();
                 chatMessagesCount = object.item2;
-
-                var j, i, pagesCount, tempPage;
-                
-               
+                var j, i, pagesCount;// tempPage;              
 
                 if (chatMessagesCount % msgOnPage != 0) {
                     pagesCount = parseInt(chatMessagesCount / msgOnPage) + 1;
@@ -353,8 +367,7 @@
                 }
                 if (pageNumber == 0) {
                     crntPage = pagesCount;
-                }
-                
+                }                
                 
                 var showBtn = document.getElementById("showmsgs");
                 showBtn.innerText = "Show next " + msgOnPage + " messages";
@@ -364,9 +377,6 @@
                 else {
                     showBtn.classList.remove("disbM");
                 }
-
-                //document.getElementById("msgfld").appendChild(GetMessagesBtn);
-
 
                 for (j = 0; j < chatMessages.length; j++) {
                     for (i = 0; i < users.length; i++) {
@@ -423,36 +433,18 @@
                             var timeFld = document.createElement("span");
                             timeFld.style.fontSize = "10px";
                             var dateMsg = chatMessages[j].creationTime.substring(2, 10);
-                            timeFld.innerText = dateMsg.substring(6, 8) + dateMsg.substring(2, 6) + dateMsg.substring(0,2)+" " + chatMessages[j].creationTime.substring(11, 16);
-                            //timeFld.innerText = chatMessages[j].creationTime.substring(2, 10) + " " + chatMessages[j].creationTime.substring(11, 16);
+                            timeFld.innerText = dateMsg.substring(6, 8) + dateMsg.substring(2, 6) + dateMsg.substring(0,2)+" " + chatMessages[j].creationTime.substring(11, 16);                            
                             timeFld.style.cssFloat = "right";
-                            MsgFld.appendChild(timeFld);
-
-                            //var creationTime = document.createElement("div");
-                            //var dateMsg = chatMessages[j].creationTime.substring(0, 10);
-                            //var timeNow = new Date();
-                            //var month = parseInt(timeNow.getMonth()) + 1;
-                            //var dateNow = timeNow.getFullYear() + "-" + month + "-" + timeNow.getDate();
-                            ////if (dateMsg == dateNow&&todayMsgExist==false) {
-                            ////    creationTime.innerText = "Today";
-                            ////}
-                            //    creationTime.innerText = dateMsg + " Smile " + dateNow;
-
-                            document.getElementById("messagefield").insertBefore(MsgFld, document.getElementById("messagefield").childNodes[0]);
-                            //document.getElementById("messagefield").insertBefore(creationTime, document.getElementById("messagefield").childNodes[0]);
-                            //tempMsgsField.appendChild(MsgFld);
-                            //document.getElementById("messagefield").appendChild(MsgFld);
+                            MsgFld.appendChild(timeFld);                           
+                            document.getElementById("messagefield").insertBefore(MsgFld, document.getElementById("messagefield").childNodes[0]);                            
                         }
                     }
-                }
-                //var messagesField = document.getElementById("messagefield");
-                //messagesField.insertBefore(tempMsgsField, messagesField.childNodes[0]);
-
+                }               
                 var scroll = document.getElementById('msgfld');
                 scroll.scrollTop = scroll.scrollHeight;
-                //scroll.animate({ scrollTop: scroll.scrollHeight });                
 
-                
+                //commented block creates pagination 
+               
                 //if (chatMessagesCount % msgOnPage != 0) {
                 //    pagesCount = parseInt(chatMessagesCount / msgOnPage) + 1;
                 //}
@@ -494,7 +486,6 @@
                 //        pageSpecBtn.innerText = scrollSymbols[i];
                 //        pageSpecBtn.id = "specpagebtn" + scrollSymbols[i];
                 //        pageSpecBtn.onclick = function () {
-
                 //            switch (this.id.substr(11)) {
                 //                case "|<":
                 //                    if (pageNumber != 1) {
@@ -529,12 +520,13 @@
                 //        document.getElementById("pagination").appendChild(pageSpecBtn);
                 //    }
                 //}
-                $("#usrTxt").focus();
 
+                $("#usrTxt").focus();
             });
         }
 
 
+        /**completly deletes selected message of the current user */
         function MsgDelete() {
             document.getElementById("mine_popup").style.display = "none";
 
@@ -550,6 +542,7 @@
         }
 
 
+        /**puts selected message of the current user in the window for editing */
         function MsgEdit() {
             document.getElementById("mine_popup").style.display = "none";
             if (crntMess.isReply) {
@@ -564,29 +557,38 @@
         }
 
 
+        /* updates edited message */
         $("#updateMsg").click(function () {
-            if (crntMess.isReply) {
-                crntMess.body = crntMess.body.substr(0, 23) + $("#usrTxt").val();
-            }
+
+            if ($("#usrTxt").val() == "") { alert("Message can't be blank!"); }
             else {
-                crntMess.body = $("#usrTxt").val();
-            }
-            $.ajax({
-                type: "PUT",
-                data: JSON.stringify(crntMess),
-                url: base_url + "Messages/" + crntMess.msgId,
-                crossDomain: true,
-                contentType: "application/json",
-                success: function (data) {
-                    ShowUsers();
+                if (crntMess.isReply) {
+                    crntMess.body = crntMess.body.substr(0, 23) + $("#usrTxt").val();
                 }
-            });
-            $("#sendBtn").css("display", "block");
-            document.getElementById("updateMsg").style.display = "none";
-            $("#usrTxt").val("");
+                else {
+                    crntMess.body = $("#usrTxt").val();
+                }
+                $.ajax({
+                    type: "PUT",
+                    data: JSON.stringify(crntMess),
+                    url: base_url + "Messages/" + crntMess.msgId,
+                    crossDomain: true,
+                    contentType: "application/json",
+                    success: function (data) {
+                        ShowUsers();
+                    }
+                });
+                $("#sendBtn").css("display", "block");
+                document.getElementById("updateMsg").style.display = "none";
+                $("#usrTxt").val("");
+            }
         });
 
 
+        /**
+         * deletes the selected message of the current user only for the user (makes it invisible for the user)
+         * @param CrntMsg: selected message
+         */
         function MsgDeleteOne(CrntMsg) {
             document.getElementById("mine_popup").style.display = "none";
 
@@ -606,11 +608,19 @@
         }
 
 
+        /**
+         * hides popup menu with selected "id"
+         * @param id: id of the popup menu
+         */
         function HidePopup(id) {
             document.getElementById(id).style.display = "none";
         }
 
 
+        /**
+         * lets user to reply for selected message
+         * @param crntMess: selected message
+         */
         function PublicReply(crntMess) {
             if (!crntMess.isReply) {
                 $("#usrTxt").val("");
@@ -635,6 +645,11 @@
         }
 
 
+        /**
+         * lets user to reply for selected message privately
+         * @param crntMsg: selected message
+         * @param crntUser: current message
+         */
         function PersonalReply(crntMsg, crntUser) {
 
             if (!crntMsg.isReply) {
@@ -645,6 +660,9 @@
             HidePopup("mine_popupPrvt");
         }
 
+
+        /*cancels a reply procedure
+         **/
         $('#CancelRplBtn').click(function () {
             $('#PrsnlRplBtn').hide();
             $('#CancelRplBtn').hide();
@@ -655,6 +673,7 @@
         });
 
 
+        /*creates a private chat and sends a reply message to this chat*/
         $('#PrsnlRplBtn').click(function () {
 
             if ($("#usrTxt").val() == "") { alert("Message can't be blank!"); }
@@ -687,12 +706,15 @@
         });
 
 
+        /**shows a registration form */
         function ShowRegistration() {
             document.getElementById("regform").style.display = "block";
             document.getElementById("loginform").style.display = "none";
 
         }
 
+
+        /**submits a registration form */
         function SubmitForm() {
             var fields = $(".ss-item-required")
                 .find("select, textarea, input").serializeArray();
@@ -735,6 +757,8 @@
             }
         }
 
+
+        /**lets user to login to chats */
         function LoginUser() {
             var fire = true;
             for (var i = 0; i < 2; i++) {
@@ -766,17 +790,23 @@
             }
         }
 
+
+        /**leaves chat creation form */
         function LeaveChtCreation() {
             document.getElementById("chatname").value = "";
             document.getElementById("chatcreationform").style.display = "none";
             document.getElementById("mainform").style.display = "block";
         }
 
+
+        /**leaves registration form */
         function LeaveRegistration() {
             document.getElementById("regform").style.display = "none";
             document.getElementById("loginform").style.display = "block";
         }
 
+
+        /**logs out current user from the chat */
         function LogOut() {
             crntUser = null;
             $("#usrTxt").val("");
@@ -784,18 +814,13 @@
             document.getElementById("loginform").style.display = "block";
         }
 
+
+        /**shows next set of messages for the current chat.
+         * The amount of the set is defined by "msgsOnPage" parameter */
         function ShowNextMsgs() {
 
             crntPage--;
-            ShowMessages(crntPage, msgsOnPage);
-            //var msgsField = document.getElementById("messagefield");
-            //var newMsgs = document.createElement("div");
-            //newMsgs.innerText = "New messages come here";
-            //newMsgs.addEventListener("click", function () {
-            //    alert("New messages... clicked");
-            //});
-            //msgsField.insertBefore(newMsgs, msgsField.childNodes[0]);
-
+            ShowMessages(crntPage, msgsOnPage);           
         }
 
     </script>

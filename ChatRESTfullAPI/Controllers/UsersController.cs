@@ -30,6 +30,7 @@ namespace ChatRESTfullAPI.Controllers
             return _context.Users;
         }
 
+
         // GET: api/Users/5
         [HttpGet("{id}")]
         public async Task<IActionResult> GetUser([FromRoute] int id)
@@ -40,7 +41,7 @@ namespace ChatRESTfullAPI.Controllers
             }
 
             var user = await _context.Users.Include(m => m.UserMessages)
-                .FirstOrDefaultAsync(p => p.UserId == id);// FindAsync(id);
+                .FirstOrDefaultAsync(p => p.UserId == id);
 
             if (user == null)
             {
@@ -50,7 +51,14 @@ namespace ChatRESTfullAPI.Controllers
             return Ok(user);
         }
 
-       [HttpGet("{email}")]
+
+        /// <summary>
+        /// checks if user exists with given email
+        /// </summary>
+        /// <param name="email">email to check</param>
+        /// <returns>user. If not exist then userId=-1</returns>
+        // GET: api/Users/email
+        [HttpGet("{email}")]
        public async Task<IActionResult>GetUser([FromRoute] string email)
        {
             if (!ModelState.IsValid)
@@ -58,7 +66,7 @@ namespace ChatRESTfullAPI.Controllers
                 return BadRequest(ModelState);
             }
 
-            var user = await _context.Users.FirstOrDefaultAsync(p => p.Email == email);// FindAsync(id);
+            var user = await _context.Users.FirstOrDefaultAsync(p => p.Email == email);
              
             if (user == null)
             {
@@ -107,6 +115,12 @@ namespace ChatRESTfullAPI.Controllers
             return NoContent();
         }
 
+
+        /// <summary>
+        /// creates a new user
+        /// </summary>
+        /// <param name="user">user to be created</param>
+        /// <returns>created user</returns>
         // POST: api/Users
         [HttpPost]
         public async Task<IActionResult> PostUser([FromBody] User user)
@@ -117,13 +131,11 @@ namespace ChatRESTfullAPI.Controllers
             }
 
             _context.Users.Add(user);
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync();          
 
-            
-
-            return Ok(user);
-            //return CreatedAtAction("GetUser", new { id = user.UserId }, user);
+            return Ok(user);           
         }
+
 
         // DELETE: api/Users/5
         [HttpDelete("{id}")]

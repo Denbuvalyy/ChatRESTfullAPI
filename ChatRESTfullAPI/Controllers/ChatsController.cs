@@ -23,7 +23,12 @@ namespace ChatRESTfullAPI.Controllers
             _context = context;
         }
 
-        // GET: api/Chats
+
+        /// <summary>
+        /// gets all chats, for chats that are private it includes chatUsers for the chat
+        /// </summary>
+        /// <returns></returns>
+        // GET: api/Chats        
         [HttpGet]
         public IEnumerable<Chat> GetChats()
         {
@@ -50,6 +55,7 @@ namespace ChatRESTfullAPI.Controllers
             return chats;
         }
 
+
         // GET: api/Chats/5
         [HttpGet("{id}")]
         public async Task<IActionResult> GetChat([FromRoute] int id)
@@ -63,13 +69,19 @@ namespace ChatRESTfullAPI.Controllers
             if (chat == null)
             {
                 return NotFound();
-            }
-            
+            }            
 
             return Ok(chat);
         }
 
 
+        /// <summary>
+        /// returns number=msgsOnPage messages for chat with chatId=Id from page=pageNumber 
+        /// </summary>
+        /// <param name="id">chat Id</param>
+        /// <param name="pageNumber">page number to return messages from</param>
+        /// <param name="msgsOnPage">number of messages to return</param>
+        /// <returns>messages from certain page</returns>
         // GET: api/Chats/5/messages/5/20
         [HttpGet("{id}/messages/{pageNumber}/{msgsOnPage}")]
         public async Task<IActionResult> GetChatMessages([FromRoute] int id,int pageNumber,int msgsOnPage)
@@ -117,21 +129,19 @@ namespace ChatRESTfullAPI.Controllers
             {
                 tempMessages = chat.ChatMessages.Skip((pagesNumb - 1) * msgsOnPage - rest).Take(msgsOnPage).ToList();
             }
-
-            //tempMessages = chat.ChatMessages.
-            //    Skip((pageNumber - 1) * msgsOnPage).TakeLast(msgsOnPage).ToList();
-
-            //List<Message> tempMessages = chat.ChatMessages.
-            //    Skip((pageNumber - 1) * msgsOnPage).Take(msgsOnPage).ToList();
-
-
+          
             (List<Message>, int) complexChat = (tempMessages, chat.ChatMessages.Count);
 
-            //(List<Message>, int) complexChat = (chat.ChatMessages.ToList(), chat.ChatMessages.Count);
             return Ok(complexChat);
-            //return Ok(chat.ChatMessages);
+
         }
 
+
+        /// <summary>
+        /// returns users for certain chat with chatId=Id
+        /// </summary>
+        /// <param name="id">chatId for chat to return users from</param>
+        /// <returns>users of the chat</returns>
         // GET: api/Chats/5/users
         [HttpGet("{id}/users")]
         public async Task<IActionResult> GetChatUsers([FromRoute] int id)
@@ -160,9 +170,17 @@ namespace ChatRESTfullAPI.Controllers
             return Ok(users.OrderBy(n=>n.UserName));
         }
 
+
+        /// <summary>
+        /// updates certain chat with Id=id
+        /// </summary>
+        /// <param name="id">chat Id</param>
+        /// <param name="message">message to be updated or added to 
+        /// the current chat</param>
+        /// <returns></returns>
         // PUT: api/Chats/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutChat([FromRoute] int id, [FromBody] Message message)//[FromBody] Chat chat)
+        public async Task<IActionResult> PutChat([FromRoute] int id, [FromBody] Message message)
         {
             if (!ModelState.IsValid)
             {
@@ -191,13 +209,7 @@ namespace ChatRESTfullAPI.Controllers
                 _context.ChatsUsers.Add(chatUser);
                 await _context.SaveChangesAsync();
             }
-            chat.ChatMessages.Add(message);
-
-            //if (id != chat.ChatId)
-            //{
-            //    return BadRequest();
-            //}
-
+            chat.ChatMessages.Add(message);          
             _context.Entry(chat).State = EntityState.Modified;
 
             try
@@ -219,6 +231,13 @@ namespace ChatRESTfullAPI.Controllers
             return NoContent();
         }
 
+
+        /// <summary>
+        /// creates a new chat. Checks if chat is private 
+        /// and if there is alredy a private chat with the same users. 
+        /// </summary>
+        /// <param name="chat">chat to be created</param>
+        /// <returns>created chat or private chat which alredy exists with such users</returns>
         // POST: api/Chats
         [HttpPost]
         public async Task<IActionResult> PostChat([FromBody] Chat chat)
@@ -280,8 +299,9 @@ namespace ChatRESTfullAPI.Controllers
             chat.ChatUsers = null;
 
             return Ok(chat);  
-            //return CreatedAtAction("GetChat", new { id = chat.ChatId }, chat);
         }
+
+
 
         // DELETE: api/Chats/5
         [HttpDelete("{id}")]
